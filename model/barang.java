@@ -86,4 +86,10 @@ public abstract class barang {
             throw new IllegalArgumentException("Jumlah harus lebih dari 0.");
         }   
     }
+
+     // override method toString untuk menampilkan informasi barang
+    @Override
+    public String toString() {
+        return "Nama Alat: " + namaAlat + ", Kode Barang: " + kodeBarang + ", Jumlah Barang: " + jumlahBarang + ", Kondisi Barang: " + kondisiBarang + ", Kategori Barang: " + kategoriBarang;
+    }
 }
