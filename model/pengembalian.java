@@ -8,19 +8,19 @@ public class pengembalian {
     private int NIMPeminjam;
     private String namaBarang;
     private String kodeBarang;
-    private int jumlahPinjam;
+    private int jumlahDikembalikan;
     private LocalDate tanggalPinjam;
     private LocalDate tanggalKembali;
     private String kondisiBarang;
 
     // constructor
-    public pengembalian(String namaPeminjam, int NIMPeminjam, String namaBarang, String kodeBarang, int jumlahPinjam, LocalDate tanggalPinjam, LocalDate tanggalKembali, String kondisiBarang) {
+    public pengembalian(String namaPeminjam, int NIMPeminjam, String namaBarang, String kodeBarang, int jumlahDikembalikan, LocalDate tanggalPinjam, LocalDate tanggalKembali, String kondisiBarang) {
         // parameter
         this.namaPeminjam = namaPeminjam;
         this.NIMPeminjam = NIMPeminjam;
         this.namaBarang = namaBarang;
         this.kodeBarang = kodeBarang;
-        this.jumlahPinjam = jumlahPinjam;
+        this.jumlahDikembalikan = jumlahDikembalikan;
         this.tanggalPinjam = tanggalPinjam;
         this.tanggalKembali = tanggalKembali;
         this.kondisiBarang = kondisiBarang;
@@ -43,8 +43,8 @@ public class pengembalian {
         return kodeBarang;
     }
 
-    public int getJumlahPinjam() {
-        return jumlahPinjam;
+    public int getJumlahDikembalikan() {
+        return jumlahDikembalikan;
     }
 
     public LocalDate getTanggalPinjam() {
@@ -76,8 +76,8 @@ public class pengembalian {
         this.kodeBarang = kodeBarang;
     }
 
-    public void setJumlahPinjam(int jumlahPinjam) {
-        this.jumlahPinjam = jumlahPinjam;
+    public void setJumlahDikembalikan(int jumlahDikembalikan) {
+        this.jumlahDikembalikan = jumlahDikembalikan;
     }
 
     public void setTanggalPinjam(LocalDate tanggalPinjam) {
@@ -95,6 +95,6 @@ public class pengembalian {
     // override method toString untuk menampilkan informasi pengembalian barang
     @Override
     public String toString() {
-         return "namaPeminjam: " + namaPeminjam + ", NIMPeminjam: " + NIMPeminjam + ", namaBarang: " + namaBarang + ", kodeBarang: " + kodeBarang + ", jumlahPinjam: " + jumlahPinjam + ", tanggalPinjam: " + tanggalPinjam + ", tanggalKembali: " + tanggalKembali + ", kondisiBarang: " + kondisiBarang;
+         return "namaPeminjam: " + namaPeminjam + ", NIMPeminjam: " + NIMPeminjam + ", namaBarang: " + namaBarang + ", kodeBarang: " + kodeBarang + ", jumlahDikembalikan: " + jumlahDikembalikan + ", tanggalPinjam: " + tanggalPinjam + ", tanggalKembali: " + tanggalKembali + ", kondisiBarang: " + kondisiBarang;
     }
 }
