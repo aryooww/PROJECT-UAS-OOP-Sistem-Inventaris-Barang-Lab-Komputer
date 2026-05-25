@@ -59,5 +59,31 @@ public abstract class barang {
         this.kategoriBarang = kategoriBarang;
     }
 
-    
+    // abstract method
+    public abstract String getJenisBarang();
+
+    // polymorphism (method overloading)
+    // method untuk mengurangi jumlah barang
+    public void kurangiJumlahBarang(int jumlah) {
+        if (jumlahBarang <= this.jumlahBarang) {
+            this.jumlahBarang -= jumlah;
+        } else {
+            throw new IllegalArgumentException("Stok tidak cukup.");
+        }        
+    }
+
+    // overloading method untuk mengurangi jumlah barang 
+    public void kurangiJumlahBarang (int jumlah, String alasan) {
+        kurangiJumlahBarang(jumlah);
+        System.out.println("Jumlah barang dikurangi karena: " + alasan);
+    }
+
+    // method untuk menambah jumlah stok barang
+    public void tambahJumlahBarang(int jumlah) {
+        if (jumlah > 0) {
+            this.jumlahBarang += jumlah;
+        } else {
+            throw new IllegalArgumentException("Jumlah harus lebih dari 0.");
+        }   
+    }
 }
