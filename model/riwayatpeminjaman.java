@@ -31,6 +31,52 @@ public class riwayatpeminjaman {
         this.status = "SELESAI";
     }
 
-    
+     // getter
+    public String getIdRiwayat() {
+        return idRiwayat;
+    }
 
+    public peminjaman getPeminjaman() {  
+        return peminjaman;
+    }
+
+    public pengembalian getPengembalian() { 
+        return pengembalian;
+    }
+
+    public LocalDate getTanggalPengembalian() {
+        return tanggalPengembalian;
+    }
+
+    public String getKondisiTerakhir() {
+        return kondisiTerakhir;
+    }
+
+    public int getJumlahDikembalikan() {
+        return jumlahDikembalikan;
+    }
+
+    public String getStatus() {
+        return status;
+    }
+
+    // setter
+    public void setIdRiwayat(String idRiwayat) {
+        this.idRiwayat = idRiwayat;
+    }
+
+    public void setStatus(String status) {
+        this.status = status;
+    }
+
+    // method untuk menampilkan riwayat pinjaman
+    public String tampilkanRiwayat() {
+        return "ID: " + idRiwayat + ", Barang: " + peminjaman.getNamaBarang() +  
+               ", Peminjam: " + peminjaman.getNamaPeminjam() +  
+               ", NIM: " + peminjaman.getNIMPeminjam() +
+               ", Tanggal Pinjam: " + peminjaman.getTanggalPinjam() +
+               ", Tanggal Kembali: " + (tanggalPengembalian != null ? tanggalPengembalian : "Belum kembali") +
+               ", Status: " + status;
+    }
 }
+
