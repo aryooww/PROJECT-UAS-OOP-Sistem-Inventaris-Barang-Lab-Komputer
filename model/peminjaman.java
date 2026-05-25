@@ -89,4 +89,16 @@ public class peminjaman {
     public void setKondisiBarang(String kondisiBarang) {
         this.kondisiBarang = kondisiBarang;
     }  
+
+    // method untuk ngecek apakah barang yg dipinjam sudah melewati batas pengembalian atau blm
+    public boolean isOverdue() {
+        LocalDate today = LocalDate.now();
+        return today.isAfter(tanggalKembali);
+    }
+
+    // override method toString untuk menampilkan informasi peminjaman
+    @Override
+    public String toString() {
+        return "namaPeminjam: " + namaPeminjam + ", NIMPeminjam: " + NIMPeminjam + ", namaBarang: " + namaBarang + ", kodeBarang: " + kodeBarang + ", jumlahPinjam: " + jumlahPinjam + ", tanggalPinjam: " + tanggalPinjam + ", tanggalKembali: " + tanggalKembali + ", kondisiBarang: " + kondisiBarang;
+    }
 }
