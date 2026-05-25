@@ -23,4 +23,70 @@ public class peminjaman {
         this.tanggalKembali = tanggalKembali;
         this.kondisiBarang = kondisiBarang;
     }
+
+    // getter
+    public String getNamaPeminjam() {
+        return namaPeminjam;
+    }
+
+    public int getNIMPeminjam() {
+        return NIMPeminjam;
+    }
+
+    public String getNamaBarang() {
+        return namaBarang;
+    }
+
+    public String getKodeBarang() {
+        return kodeBarang;
+    }
+
+    public int getJumlahPinjam() {
+        return jumlahPinjam;
+    }
+
+    public LocalDate getTanggalPinjam() {
+        return tanggalPinjam;
+    }
+
+    public LocalDate getTanggalKembali() {
+        return tanggalKembali;
+    }
+
+    public String getKondisiBarang() {
+        return kondisiBarang;
+    }
+
+    // setter
+    public void setNamaPeminjam(String namaPeminjam) {
+        this.namaPeminjam = namaPeminjam;
+    }
+
+    public void setNIMPeminjam(int NIMPeminjam) {
+        this.NIMPeminjam = NIMPeminjam;
+    }
+
+    public void setNamaBarang(String namaBarang) {
+        this.namaBarang = namaBarang;
+    }
+
+    public void setKodeBarang(String kodeBarang) {
+        this.kodeBarang = kodeBarang;
+    }
+
+    public void setJumlahPinjam(int jumlahPinjam) {
+        this.jumlahPinjam = jumlahPinjam;
+    }
+
+    public void setTanggalPinjam(LocalDate tanggalPinjam) {
+        this.tanggalPinjam = tanggalPinjam;
+    }
+
+    public void setTanggalKembali(LocalDate tanggalKembali) {
+        this.tanggalKembali = tanggalKembali;
+    }
+
+    public void setKondisiBarang(String kondisiBarang) {
+        this.kondisiBarang = kondisiBarang;
+    }  
 }
