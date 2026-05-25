@@ -97,3 +97,4 @@ public class pengembalian {
     public String toString() {
          return "namaPeminjam: " + namaPeminjam + ", NIMPeminjam: " + NIMPeminjam + ", namaBarang: " + namaBarang + ", kodeBarang: " + kodeBarang + ", jumlahPinjam: " + jumlahPinjam + ", tanggalPinjam: " + tanggalPinjam + ", tanggalKembali: " + tanggalKembali + ", kondisiBarang: " + kondisiBarang;
     }
+}
