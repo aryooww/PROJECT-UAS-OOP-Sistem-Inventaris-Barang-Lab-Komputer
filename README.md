@@ -27,7 +27,7 @@ Aplikasi desktop berbasis Java Swing untuk mengelola data barang, transaksi stok
 ## Teknologi yang Digunakan
 
 - Java 8 atau lebih tinggi
-- Swing (GUI)
+- JavaFx (GUI)
 - Model-View-Controller (MVC) pattern
 - Penyimpanan data sementara dalam memori (ArrayList)
 
