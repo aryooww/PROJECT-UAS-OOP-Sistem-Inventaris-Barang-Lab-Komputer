@@ -7,7 +7,7 @@ public class Main {
         Scanner penyeleksiMode = new Scanner(System.in);
 
         System.out.println("=================================================");
-        System.out.println("[SYSTEM] Menyalakan Sistem Inventaris Lab...");
+        System.out.println("[SISTEM] Menyalakan Sistem Inventaris Lab...");
         System.out.println("=================================================");
         System.out.println("PILIH MODE DEMO APLIKASI:");
         System.out.println("1. Jalankan Mode GUI (Jendela Visual Swing)");
