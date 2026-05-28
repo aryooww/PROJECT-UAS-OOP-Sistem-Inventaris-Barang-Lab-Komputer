@@ -28,7 +28,7 @@ public class Main {
         // Percabangan untuk menentukan mode runtime aplikasi
         if (modePilihan == 1) {
             //Mengeksekusi mode GUI
-            System.out.println("[SYSTEM] Mengaktifkan Thread Jendela GUI Visual...");
+            System.out.println("[SISTEM] Mengaktifkan Thread Jendela GUI Visual...");
             try {
                 for (javax.swing.UIManager.LookAndFeelInfo info : javax.swing.UIManager.getInstalledLookAndFeels()) {
                     if ("Nimbus".equals(info.getName())) {
@@ -47,7 +47,7 @@ public class Main {
 
         } else if (modePilihan == 2) {
             // Mengeksekusi mode terminal
-            System.out.println("[SYSTEM] Mengaktifkan Mode Interaksi Terminal...\n");
+            System.out.println("[SISTEM] Mengaktifkan Mode Interaksi Terminal...\n");
             MainMenuConsole menuTerminal = new MainMenuConsole();
             menuTerminal.jalankan();
 
