@@ -3,9 +3,6 @@ package view;
 import model.*;
 import controller.*;
 import javax.swing.*;
-import javax.swing.border.EmptyBorder;
-import javax.swing.border.LineBorder;
-import javax.swing.border.TitledBorder;
 import java.awt.*;
 import java.time.LocalDate;
 
@@ -15,204 +12,230 @@ public class MainMenuGUI extends JFrame {
     private RiwayatPeminjamanService riwayatService = new RiwayatPeminjamanService();
     private PeminjamanService peminjamanService = new PeminjamanService(barangService, riwayatService);
 
-    // Definisi Warna & Font
-    private final Color COLOR_PRIMARY = new Color(44, 62, 80);  
-    private final Color COLOR_ACCENT = new Color(52, 152, 219);   
-    private final Color COLOR_SUCCESS = new Color(46, 204, 113);   
-    private final Color COLOR_BG = new Color(236, 240, 241);     
-    private final Font FONT_TITLE = new Font("Segoe UI", Font.BOLD, 18);
-
     public MainMenuGUI() {
-        // Inisialisasi data awal
+        // Data Dummy Awal
         barangService.create(new barangElektronik("Monitor Lab LED", "MN01", 8, "BAIK", "KOMPUTER", "LG", "Hitam"));
 
-        // Konfigurasi jendela utama
-        setTitle("Inventory Lab Manager v1.0");
-        setSize(800, 600);
+        // Konfigurasi Frame Utama
+        setTitle("Sistem Inventaris & Peminjaman Lab Komputer");
+        setSize(850, 600); 
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setLocationRelativeTo(null);
-        getContentPane().setBackground(COLOR_BG);
 
-        // Header Aplikasi
-        JPanel headerPanel = new JPanel();
-        headerPanel.setBackground(COLOR_PRIMARY);
-        JLabel lblAppTitle = new JLabel("SISTEM INVENTARIS BARANG LAB KOMPUTER");
-        lblAppTitle.setForeground(Color.WHITE);
-        lblAppTitle.setFont(new Font("Segoe UI", Font.BOLD, 22));
-        lblAppTitle.setBorder(new EmptyBorder(20, 0, 20, 0));
-        headerPanel.add(lblAppTitle);
-        add(headerPanel, BorderLayout.NORTH);
-
-        // Konfigurasi TabbedPane
         JTabbedPane tabbedPane = new JTabbedPane();
         tabbedPane.setFont(new Font("Segoe UI", Font.BOLD, 12));
-        tabbedPane.setBackground(Color.WHITE);
         
-        tabbedPane.addTab(" Kelola Barang  ", buatPanelBarang());
-        tabbedPane.addTab(" Peminjaman  ", buatPanelPinjam());
-        tabbedPane.addTab(" Pengembalian  ", buatPanelKembali());
-        tabbedPane.addTab(" Laporan  ", buatPanelLaporan());
+        tabbedPane.addTab("Kelola Barang", buatPanelKelolaBarang());
+        tabbedPane.addTab("Peminjaman & Pengembalian", buatPanelPeminjaman());
+        tabbedPane.addTab("Laporan Transaksi", buatPanelLaporan());
 
-        add(tabbedPane, BorderLayout.CENTER);
+        add(tabbedPane);
     }
 
-    // Helper untuk Styling Button
-    private void styleButton(JButton btn, Color color) {
-        btn.setBackground(color);
-        btn.setForeground(Color.WHITE);
-        btn.setFocusPainted(false);
-        btn.setFont(new Font("Segoe UI", Font.BOLD, 14));
-        btn.setCursor(new Cursor(Cursor.HAND_CURSOR));
-        btn.setBorder(new EmptyBorder(10, 10, 10, 10));
-    }
+    // KELOLA BARANG
+    private JPanel buatPanelKelolaBarang() {
+        JPanel panelUtama = new JPanel(new BorderLayout(15, 15));
+        panelUtama.setBorder(BorderFactory.createEmptyBorder(15, 15, 15, 15));
 
-    // Helper untuk Container Form agar rapi di tengah
-    private JPanel createFormContainer(String title) {
-        JPanel wrapper = new JPanel(new GridBagLayout());
-        wrapper.setBackground(COLOR_BG);
-        JPanel form = new JPanel();
-        form.setBackground(Color.WHITE);
-        form.setBorder(new TitledBorder(new LineBorder(COLOR_PRIMARY, 1), title, 
-                       TitledBorder.LEFT, TitledBorder.TOP, FONT_TITLE, COLOR_PRIMARY));
-        form.setPreferredSize(new Dimension(500, 350));
-        wrapper.add(form);
-        return form;
-    }
+        // Form input & hapus
+        JPanel panelKiri = new JPanel(new GridLayout(2, 1, 10, 10));
+        panelKiri.setPreferredSize(new Dimension(350, 0));
 
-    private JPanel buatPanelBarang() {
-        JPanel container = createFormContainer("Input Data Barang Baru");
-        container.setLayout(new GridLayout(5, 2, 15, 15));
-        container.setBorder(new EmptyBorder(30, 40, 30, 40));
-
+        // Form Tambah
+        JPanel formTambah = new JPanel(new GridLayout(4, 2, 5, 10));
+        formTambah.setBorder(BorderFactory.createTitledBorder("Tambah Barang Baru"));
         JTextField txtNama = new JTextField();
         JTextField txtKode = new JTextField();
         JTextField txtStok = new JTextField();
-        JButton btnSimpan = new JButton("Simpan ke Database");
-        styleButton(btnSimpan, COLOR_SUCCESS);
+        JButton btnSimpan = new JButton("Simpan Barang");
 
-        container.add(new JLabel("Nama Barang:")); container.add(txtNama);
-        container.add(new JLabel("Kode Barang:")); container.add(txtKode);
-        container.add(new JLabel("Jumlah Stok:")); container.add(txtStok);
-        container.add(new JLabel("")); 
-        container.add(btnSimpan);
+        formTambah.add(new JLabel("Nama Barang:")); formTambah.add(txtNama);
+        formTambah.add(new JLabel("Kode Barang:")); formTambah.add(txtKode);
+        formTambah.add(new JLabel("Jumlah Stok:")); formTambah.add(txtStok);
+        formTambah.add(new JLabel("")); formTambah.add(btnSimpan);
+
+        // Form Hapus
+        JPanel formHapus = new JPanel(new GridLayout(3, 2, 5, 10));
+        formHapus.setBorder(BorderFactory.createTitledBorder("Hapus Barang"));
+        JTextField txtKodeHapus = new JTextField();
+        JButton btnHapus = new JButton("Hapus Barang");
+        
+        formHapus.add(new JLabel("Masukkan Kode:")); formHapus.add(txtKodeHapus);
+        formHapus.add(new JLabel("")); formHapus.add(btnHapus);
+        formHapus.add(new JLabel("")); formHapus.add(new JLabel("")); 
+
+        panelKiri.add(formTambah);
+        panelKiri.add(formHapus);
+
+        // Daftar Barang
+        JPanel panelKanan = new JPanel(new BorderLayout());
+        panelKanan.setBorder(BorderFactory.createTitledBorder("Daftar Semua Barang"));
+        JTextArea txtAreaDaftar = new JTextArea();
+        txtAreaDaftar.setEditable(false);
+        txtAreaDaftar.setFont(new Font("Consolas", Font.PLAIN, 12));
+        
+        panelKanan.add(new JScrollPane(txtAreaDaftar), BorderLayout.CENTER);
+
+        // Logika & aksi
+        Runnable muatDaftar = () -> {
+            txtAreaDaftar.setText("");
+            for(barang b : barangService.readAll()) {
+                txtAreaDaftar.append(b.toString() + "\n");
+            }
+        };
 
         btnSimpan.addActionListener(e -> {
             try {
                 if (txtNama.getText().isEmpty() || txtKode.getText().isEmpty()) {
-                    JOptionPane.showMessageDialog(this, "Data tidak boleh kosong!");
-                    return;
+                    JOptionPane.showMessageDialog(this, "Data tidak boleh kosong!"); return;
                 }
                 int stok = Integer.parseInt(txtStok.getText());
                 barangService.create(new barangElektronik(txtNama.getText(), txtKode.getText(), stok, "BAIK", "KOMPUTER", "-", "-"));
-                JOptionPane.showMessageDialog(this, "Barang Berhasil Disimpan!", "Sukses", JOptionPane.INFORMATION_MESSAGE);
+                JOptionPane.showMessageDialog(this, "Barang Tersimpan!");
                 txtNama.setText(""); txtKode.setText(""); txtStok.setText("");
+                muatDaftar.run(); 
             } catch (Exception ex) {
-                JOptionPane.showMessageDialog(this, "Error: " + ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+                JOptionPane.showMessageDialog(this, "Error: " + ex.getMessage(), "Gagal", JOptionPane.ERROR_MESSAGE);
             }
         });
 
-        // Mengembalikan JPanel utama yang membungkus form di tengah
-        JPanel outer = new JPanel(new BorderLayout());
-        outer.add(container.getParent(), BorderLayout.CENTER);
-        return outer;
+        btnHapus.addActionListener(e -> {
+            try {
+                String kode = txtKodeHapus.getText();
+                if (kode.isEmpty()) { JOptionPane.showMessageDialog(this, "Kode tidak boleh kosong!"); return; }
+                
+                barangService.delete(kode); 
+                JOptionPane.showMessageDialog(this, "Barang Dihapus!");
+                txtKodeHapus.setText("");
+                muatDaftar.run(); 
+            } catch (Exception ex) {
+                JOptionPane.showMessageDialog(this, "Gagal Hapus: " + ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+            }
+        });
+
+        panelUtama.add(panelKiri, BorderLayout.WEST);
+        panelUtama.add(panelKanan, BorderLayout.CENTER);
+        
+        muatDaftar.run(); 
+        return panelUtama;
     }
 
-    private JPanel buatPanelPinjam() {
-        JPanel container = createFormContainer("Form Peminjaman Barang");
-        container.setLayout(new GridLayout(6, 2, 10, 10));
-        container.setBorder(new EmptyBorder(25, 40, 25, 40));
+    // PEMINJAMAN & PENGEMBALIAN
+    private JPanel buatPanelPeminjaman() {
+        JPanel panelUtama = new JPanel(new BorderLayout(15, 15));
+        panelUtama.setBorder(BorderFactory.createEmptyBorder(15, 15, 15, 15));
 
+        // Form Peminjaman & pengembalian
+        JPanel panelKiri = new JPanel(new GridLayout(2, 1, 10, 10));
+        panelKiri.setPreferredSize(new Dimension(350, 0));
+
+        // Form Pinjam
+        JPanel formPinjam = new JPanel(new GridLayout(5, 2, 5, 5));
+        formPinjam.setBorder(BorderFactory.createTitledBorder("Form Peminjaman"));
         JTextField txtNama = new JTextField();
         JTextField txtNim = new JTextField();
         JTextField txtKode = new JTextField();
         JTextField txtJumlah = new JTextField();
         JButton btnPinjam = new JButton("Proses Pinjam");
-        styleButton(btnPinjam, COLOR_ACCENT);
 
-        container.add(new JLabel("Nama Peminjam:")); container.add(txtNama);
-        container.add(new JLabel("NIM:")); container.add(txtNim);
-        container.add(new JLabel("Kode Barang:")); container.add(txtKode);
-        container.add(new JLabel("Jumlah Pinjam:")); container.add(txtJumlah);
-        container.add(new JLabel("")); container.add(btnPinjam);
+        formPinjam.add(new JLabel("Nama:")); formPinjam.add(txtNama);
+        formPinjam.add(new JLabel("NIM:")); formPinjam.add(txtNim);
+        formPinjam.add(new JLabel("Kode Barang:")); formPinjam.add(txtKode);
+        formPinjam.add(new JLabel("Jumlah:")); formPinjam.add(txtJumlah);
+        formPinjam.add(new JLabel("")); formPinjam.add(btnPinjam);
+
+        // Form Kembali
+        JPanel formKembali = new JPanel(new GridLayout(3, 2, 5, 5));
+        formKembali.setBorder(BorderFactory.createTitledBorder("Form Pengembalian"));
+        JTextField txtIdRiwayat = new JTextField();
+        JTextField txtJumlahKembali = new JTextField();
+        JButton btnKembali = new JButton("Kembalikan");
+
+        formKembali.add(new JLabel("ID Riwayat:")); formKembali.add(txtIdRiwayat);
+        formKembali.add(new JLabel("Jml Kembali:")); formKembali.add(txtJumlahKembali);
+        formKembali.add(new JLabel("")); formKembali.add(btnKembali);
+
+        panelKiri.add(formPinjam);
+        panelKiri.add(formKembali);
+
+        // Daftar Riwayat Peminjaman
+        JPanel panelKanan = new JPanel(new BorderLayout());
+        panelKanan.setBorder(BorderFactory.createTitledBorder("Riwayat Peminjaman"));
+        JTextArea txtAreaRiwayat = new JTextArea();
+        txtAreaRiwayat.setEditable(false);
+        txtAreaRiwayat.setFont(new Font("Consolas", Font.PLAIN, 12));
+        
+        panelKanan.add(new JScrollPane(txtAreaRiwayat), BorderLayout.CENTER);
+
+        // Logika & aksi
+        Runnable muatRiwayat = () -> {
+            txtAreaRiwayat.setText("");
+            for(riwayatpeminjaman r : riwayatService.readAll()) {
+                txtAreaRiwayat.append(r.tampilkanRiwayat() + "\n");
+            }
+        };
 
         btnPinjam.addActionListener(e -> {
             try {
                 int nim = Integer.parseInt(txtNim.getText());
                 int jumlah = Integer.parseInt(txtJumlah.getText());
-                riwayatpeminjaman r = peminjamanService.pinjamBarang(txtNama.getText(), nim, txtKode.getText(), jumlah, LocalDate.now(), LocalDate.now().plusDays(7), "BAIK");
-                JOptionPane.showMessageDialog(this, "Peminjaman Berhasil!\nID: " + r.getIdRiwayat());
+                riwayatpeminjaman riwayat = peminjamanService.pinjamBarang(
+                    txtNama.getText(), nim, txtKode.getText(), jumlah, LocalDate.now(), LocalDate.now().plusDays(7), "BAIK"
+                );
+                JOptionPane.showMessageDialog(this, "Berhasil Pinjam! ID: " + riwayat.getIdRiwayat());
+                txtNama.setText(""); txtNim.setText(""); txtKode.setText(""); txtJumlah.setText("");
+                muatRiwayat.run();
             } catch (Exception ex) {
                 JOptionPane.showMessageDialog(this, ex.getMessage(), "Gagal", JOptionPane.ERROR_MESSAGE);
             }
         });
 
-        JPanel outer = new JPanel(new BorderLayout());
-        outer.add(container.getParent(), BorderLayout.CENTER);
-        return outer;
-    }
-
-    private JPanel buatPanelKembali() {
-        JPanel container = createFormContainer("Form Pengembalian Barang");
-        container.setLayout(new GridLayout(4, 2, 15, 15));
-        container.setBorder(new EmptyBorder(40, 40, 40, 40));
-
-        JTextField txtIdRiwayat = new JTextField();
-        JTextField txtJumlah = new JTextField();
-        JButton btnKembali = new JButton("Kembalikan Barang");
-        styleButton(btnKembali, COLOR_PRIMARY);
-
-        container.add(new JLabel("ID Riwayat:")); container.add(txtIdRiwayat);
-        container.add(new JLabel("Jumlah Kembali:")); container.add(txtJumlah);
-        container.add(new JLabel("")); container.add(btnKembali);
-
         btnKembali.addActionListener(e -> {
             try {
-                int jumlah = Integer.parseInt(txtJumlah.getText());
+                int jumlah = Integer.parseInt(txtJumlahKembali.getText());
                 peminjamanService.kembalikanBarang(txtIdRiwayat.getText(), jumlah, LocalDate.now(), "BAIK");
-                JOptionPane.showMessageDialog(this, "Data Berhasil Diupdate!");
+                JOptionPane.showMessageDialog(this, "Barang berhasil dikembalikan!");
+                txtIdRiwayat.setText(""); txtJumlahKembali.setText("");
+                muatRiwayat.run();
             } catch (Exception ex) {
-                JOptionPane.showMessageDialog(this, ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+               JOptionPane.showMessageDialog(this, ex.getMessage(), "Error Pengembalian", JOptionPane.ERROR_MESSAGE); 
             }
         });
 
-        JPanel outer = new JPanel(new BorderLayout());
-        outer.add(container.getParent(), BorderLayout.CENTER);
-        return outer;
+        panelUtama.add(panelKiri, BorderLayout.WEST);
+        panelUtama.add(panelKanan, BorderLayout.CENTER);
+        
+        muatRiwayat.run();
+        return panelUtama;
     }
 
+    // LAPORAN
     private JPanel buatPanelLaporan() {
-        JPanel panel = new JPanel(new BorderLayout(10, 10));
-        panel.setBackground(COLOR_BG);
-        panel.setBorder(new EmptyBorder(15, 15, 15, 15));
+        JPanel panelUtama = new JPanel(new BorderLayout(10, 10));
+        panelUtama.setBorder(BorderFactory.createEmptyBorder(15, 15, 15, 15));
 
-        JTextArea txtArea = new JTextArea();
-        txtArea.setEditable(false);
-        txtArea.setFont(new Font("Consolas", Font.PLAIN, 13));
-        txtArea.setBackground(new Color(253, 253, 253));
+        JTextArea txtLaporan = new JTextArea();
+        txtLaporan.setEditable(false); 
+        txtLaporan.setFont(new Font("Consolas", Font.PLAIN, 13));
         
-        JButton btnRefresh = new JButton("Perbarui Data Laporan");
-        styleButton(btnRefresh, COLOR_PRIMARY);
+        JButton btnRefresh = new JButton("Perbarui Log Laporan Transaksi");
 
-        Runnable loadData = () -> {
-            txtArea.setText("====== LAPORAN INVENTARIS LAB ======\n\n");
-            txtArea.append("[DATA BARANG]\n");
-            for(barang b : barangService.readAll()) txtArea.append(" > " + b.toString() + "\n");
-            
-            txtArea.append("\n[DATA PEMINJAMAN AKTIF]\n");
-            for(riwayatpeminjaman r : riwayatService.readAll()) txtArea.append(" > " + r.tampilkanRiwayat() + "\n");
-        };
-
-        btnRefresh.addActionListener(e -> loadData.run());
-        
-        // [ROBUSTNESS] Auto update saat tab diklik
-        panel.addAncestorListener(new javax.swing.event.AncestorListener() {
-            public void ancestorAdded(javax.swing.event.AncestorEvent event) { loadData.run(); }
-            public void ancestorRemoved(javax.swing.event.AncestorEvent event) {}
-            public void ancestorMoved(javax.swing.event.AncestorEvent event) {}
+        btnRefresh.addActionListener(e -> {
+            txtLaporan.setText("=== LAPORAN TRANSAKSI (MASUK / KELUAR) ===\n\n");
+            try {
+                // Mengambil fungsi dari Role 2 (transaksiService)
+                for(Object log : transaksiService.readAll()) { 
+                    txtLaporan.append(log.toString() + "\n");
+                }
+            } catch (Exception ex) {
+                txtLaporan.append("Menunggu implementasi readAll() pada log transaksi dari Role 2...\n");
+                txtLaporan.append("Atau format pengambilan data berbeda dari controller.");
+            }
         });
 
-        panel.add(btnRefresh, BorderLayout.NORTH);
-        panel.add(new JScrollPane(txtArea), BorderLayout.CENTER);
-        return panel;
+        panelUtama.add(btnRefresh, BorderLayout.NORTH);
+        panelUtama.add(new JScrollPane(txtLaporan), BorderLayout.CENTER);
+        
+        return panelUtama;
     }
 }
