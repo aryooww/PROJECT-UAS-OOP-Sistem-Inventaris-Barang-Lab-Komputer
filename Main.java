@@ -21,9 +21,7 @@ public class Main {
         } catch (NumberFormatException e) {
             System.out.println("\n[ROBUSTNESS] Input tidak valid! masuk ke Mode Terminal\n");
             modePilihan = 2; 
-        } finally {
-            penyeleksiMode.close();
-        }
+        } 
 
         // Percabangan untuk menentukan mode runtime aplikasi
         if (modePilihan == 1) {
