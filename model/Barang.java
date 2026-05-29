@@ -1,13 +1,11 @@
-package src.model;
+package model;
 
-// Abstract class untuk barang
 public abstract class Barang {
     private String id;
     private String nama;
     private int jumlah;
     private String lokasi;
 
-    // Constructor
     public Barang(String id, String nama, int jumlah, String lokasi) {
         this.id = id;
         this.nama = nama;
@@ -15,39 +13,23 @@ public abstract class Barang {
         this.lokasi = lokasi;
     }
 
-    // Getter
-    public String getId() {
-        return id;
-    }
+    // Encapsulation getter
+    public String getId() { return id; }
 
-    public String getNama() {
-        return nama;
-    }
+    public String getNama() { return nama; }
 
-    public int getJumlah() {
-        return jumlah;
-    }
+    public int getJumlah() { return jumlah; }
 
-    public String getLokasi() {
-        return lokasi;
-    }
+    public String getLokasi() { return lokasi; }
 
-    // Setter
-    public void setId(String id) {
-        this.id = id;
-    }
+    // setter
+    public void setId(String id) { this.id = id; }
 
-    public void setNama(String nama) {
-        this.nama = nama;
-    }
+    public void setNama(String nama) { this.nama = nama;}
 
-    public void setJumlah(int jumlah) {
-        this.jumlah = jumlah;
-    }
+    public void setJumlah(int jumlah) { this.jumlah = jumlah;}
 
-    public void setLokasi(String lokasi) {
-        this.lokasi = lokasi;
-    }
+    public void setLokasi(String lokasi) { this.lokasi = lokasi; }
 
     // Method abstract yang wajib diimplement subclass
     public abstract String getKategori();
