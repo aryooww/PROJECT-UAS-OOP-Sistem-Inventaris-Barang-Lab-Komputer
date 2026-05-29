@@ -49,4 +49,13 @@ public abstract class barang {
         this.lokasi = lokasi;
     }
 
+    // Method abstract yang wajib diimplement subclass
+    public abstract String getKategori();
+
+    @Override
+    public String toString() {
+        return String.format("ID: %s | Nama: %s | Jumlah: %d | Lokasi: %s | Kategori: %s",
+                id, nama, jumlah, lokasi, getKategori());
+    }
+
 }
