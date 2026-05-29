@@ -21,7 +21,6 @@ public class MainMenuGUI extends JFrame {
     private final Color COLOR_SUCCESS = new Color(46, 204, 113);   
     private final Color COLOR_BG = new Color(236, 240, 241);     
     private final Font FONT_TITLE = new Font("Segoe UI", Font.BOLD, 18);
-    private final Font FONT_LABEL = new Font("Segoe UI", Font.PLAIN, 13);
 
     public MainMenuGUI() {
         // Inisialisasi data awal
