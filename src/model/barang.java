@@ -1,14 +1,14 @@
 package src.model;
 
 // Abstract class untuk barang
-public abstract class barang {
+public abstract class Barang {
     private String id;
     private String nama;
     private int jumlah;
     private String lokasi;
 
     // Constructor
-    public barang(String id, String nama, int jumlah, String lokasi) {
+    public Barang(String id, String nama, int jumlah, String lokasi) {
         this.id = id;
         this.nama = nama;
         this.jumlah = jumlah;
