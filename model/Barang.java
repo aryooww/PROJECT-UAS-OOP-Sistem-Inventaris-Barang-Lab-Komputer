@@ -1,5 +1,6 @@
 package model;
 
+
 public abstract class Barang {
     private String id;
     private String nama;
