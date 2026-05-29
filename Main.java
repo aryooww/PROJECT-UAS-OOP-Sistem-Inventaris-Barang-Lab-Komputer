@@ -1,58 +1,45 @@
-import view.MainMenuConsole;
-import view.MainMenuGUI;
+import view.MainConsole;
+import view.MainGUI;
+
+import javax.swing.SwingUtilities;
 import java.util.Scanner;
 
 public class Main {
     public static void main(String[] args) {
-        Scanner penyeleksiMode = new Scanner(System.in);
-
-        System.out.println("=================================================");
-        System.out.println("[SISTEM] Menyalakan Sistem Inventaris Lab...");
-        System.out.println("=================================================");
-        System.out.println("PILIH MODE DEMO APLIKASI:");
-        System.out.println("1. Jalankan Mode GUI (Jendela Visual Swing)");
-        System.out.println("2. Jalankan Mode Terminal (Console Teks / Scanner)");
-        System.out.print("Masukkan pilihan Anda (1 / 2): ");
-
-        // Mengamankan menu pemilihan mode
-        int modePilihan = 0;
-        try {
-            modePilihan = Integer.parseInt(penyeleksiMode.nextLine());
-        } catch (NumberFormatException e) {
-            System.out.println("\n[ROBUSTNESS] Input tidak valid! masuk ke Mode Terminal\n");
-            modePilihan = 2; 
-        } 
-
-        // Percabangan untuk menentukan mode runtime aplikasi
-        if (modePilihan == 1) {
-            //Mengeksekusi mode GUI
-            System.out.println("[SISTEM] Mengaktifkan Thread Jendela GUI Visual...");
-            try {
-                for (javax.swing.UIManager.LookAndFeelInfo info : javax.swing.UIManager.getInstalledLookAndFeels()) {
-                    if ("Nimbus".equals(info.getName())) {
-                        javax.swing.UIManager.setLookAndFeel(info.getClassName());
-                        break;
-                    }
-                }
-            } catch (Exception e) {
-                System.err.println("Gagal memuat tema visual Nimbus.");
-            }
-
-            javax.swing.SwingUtilities.invokeLater(() -> {
-                MainMenuGUI menuUtama = new MainMenuGUI();
-                menuUtama.setVisible(true);
+        Scanner scanner = new Scanner(System.in);
+        
+        System.out.println("==================================================");
+        System.out.println("      SISTEM INVENTARIS BARANG LAB KOMPUTER       ");
+        System.out.println("==================================================");
+        System.out.println("Pilih mode tampilan aplikasi:");
+        System.out.println("1. Mode Terminal / Console (CLI)");
+        System.out.println("2. Mode Visual / Jendela (GUI)");
+        System.out.print("Masukkan pilihan Anda (1/2): ");
+        
+        String pilihan = scanner.nextLine();
+        
+        if (pilihan.equals("1")) {
+            System.out.println("\n[!] Memulai Aplikasi Mode Console...\n");
+            // Menjalankan MainConsole.java
+            MainConsole consoleApp = new MainConsole();
+            consoleApp.start();
+            
+        } else if (pilihan.equals("2")) {
+            System.out.println("\n[!] Memulai Aplikasi Mode GUI...");
+            // Menjalankan MainGUI.java menggunakan thread SwingUtilities agar aman
+            SwingUtilities.invokeLater(() -> {
+                new MainGUI();
             });
-
-        } else if (modePilihan == 2) {
-            // Mengeksekusi mode terminal
-            System.out.println("[SISTEM] Mengaktifkan Mode Interaksi Terminal...\n");
-            MainMenuConsole menuTerminal = new MainMenuConsole();
-            menuTerminal.jalankan();
-
+            
         } else {
-            System.out.println("\n[VALIDASI] Angka pilihan salah! masuk ke Mode Terminal...\n");
-            MainMenuConsole menuTerminal = new MainMenuConsole();
-            menuTerminal.jalankan();
+            System.out.println("\n[X] Pilihan tidak valid!");
+            System.out.println("Menjalankan Mode GUI secara otomatis sebagai default...");
+            SwingUtilities.invokeLater(() -> {
+                new MainGUI();
+            });
         }
+        
+        // Menutup scanner (Mencegah Resource Leak)
+        scanner.close();
     }
 }
