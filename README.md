@@ -6,19 +6,16 @@ Aplikasi desktop berbasis Java Swing untuk mengelola data barang, transaksi stok
 
 - **Manajemen Barang**  
   - Tambah, edit, hapus barang  
-  - Dua jenis barang: Elektronik (merk, warna) dan Non-Elektronik (bahan, warna)  
-  - Setiap penambahan/penghapusan stok otomatis mencatat transaksi
+  - Dua jenis barang: Elektronik (tegangan) dan Non-Elektronik (bahan)  
 
 - **Transaksi Stok Manual**  
   - Tambah stok (barang masuk)  
   - Kurangi stok (barang keluar)  
-  - Riwayat transaksi lengkap dengan petugas, alasan, dan tanggal
 
 - **Peminjaman & Pengembalian**  
   - Peminjaman barang dengan pencatatan kondisi awal  
   - Pengembalian sebagian/seluruh jumlah  
-  - Status peminjaman ("BELUM DIKEMBALIKAN" / "SELESAI")  
-  - Transaksi stok otomatis saat peminjaman (keluar) dan pengembalian (masuk)
+  - Status peminjaman ("DIPINJAM", "SEBAGIAN", "SELESAI")  
 
 - **Laporan**  
   - Cetak laporan data barang  
