@@ -1,6 +1,4 @@
-import view.MainConsole;
-import view.MainGUI;
-
+package view;
 import javax.swing.SwingUtilities;
 import java.util.Scanner;
 
