@@ -1,6 +1,6 @@
 # Sistem Manajemen Inventaris dan Peminjaman
 
-Aplikasi desktop berbasis Java Swing untuk mengelola data barang, transaksi stok (masuk/keluar), peminjaman barang, serta pembuatan laporan.
+Aplikasi desktop berbasis Java Swing untuk mengelola data barang, peminjaman barang, serta pembuatan laporan.
 
 ## Fitur Utama
 
