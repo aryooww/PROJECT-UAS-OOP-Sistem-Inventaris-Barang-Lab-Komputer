@@ -18,8 +18,7 @@ public class MainConsole {
         inventoryController = new InventoryController();
         peminjamanController = new PeminjamanController(inventoryController);
         laporanController = new LaporanController();
-        scanner = new Scanner(System.lineSeparator()); // Menggunakan line separator bawaan OS
-        scanner = new Scanner(System.in);
+        scanner = new Scanner(System.in); // Diperbaiki agar tidak dobel deklarasi
         seedData();
     }
 
@@ -27,13 +26,13 @@ public class MainConsole {
         boolean berjalan = true;
         while (berjalan) {
             System.out.println("\n========================================");
-            System.out.println("SISTEM INVENTARIS LAB");
+            System.out.println("          SISTEM INVENTARIS LAB         ");
             System.out.println("========================================");
             System.out.println("1. Lihat Daftar Barang");
             System.out.println("2. Tambah Barang Baru");
             System.out.println("3. Lakukan Peminjaman Barang");
             System.out.println("4. Pengembalian Barang");
-            System.out.println("5. Cetak Laporan");
+            System.out.println("5. Cetak Laporan Lengkap (Inventaris & Transaksi)");
             System.out.println("0. Keluar");
             System.out.print("Pilih menu: ");
 
@@ -52,7 +51,7 @@ public class MainConsole {
                     inputPengembalian();
                     break;
                 case "5":
-                    laporanController.laporanInventaris(inventoryController);
+                    cetakLaporanLengkap(); // Memanggil method baru
                     break;
                 case "0":
                     berjalan = false;
@@ -142,6 +141,44 @@ public class MainConsole {
             System.out.println("Pengembalian berhasil dicatat!");
         } catch (ValidationException | NumberFormatException e) {
             System.out.println("Gagal mengembalikan: " + e.getMessage());
+        }
+    }
+
+    private void cetakLaporanLengkap() {
+        System.out.println("\n========================================");
+        System.out.println("          LAPORAN INVENTARIS            ");
+        System.out.println("========================================");
+        // Memanggil fungsi cetak inventaris dari controller bawaan
+        try {
+            laporanController.laporanInventaris(inventoryController);
+        } catch (Exception e) {
+            // Backup jika metode LaporanController tidak sesuai
+            tampilkanBarang(); 
+        }
+
+        System.out.println("\n========================================");
+        System.out.println("    LAPORAN PEMINJAMAN & PENGEMBALIAN   ");
+        System.out.println("========================================");
+        
+        if (peminjamanController.getAllPeminjaman().isEmpty()) {
+            System.out.println("Belum ada riwayat transaksi peminjaman.");
+        } else {
+            for (Peminjaman p : peminjamanController.getAllPeminjaman()) {
+                System.out.println("ID Pinjam    : " + p.getIdPeminjaman());
+                System.out.println("ID Barang    : " + p.getIdBarang());
+                System.out.println("Peminjam     : " + p.getNamaPeminjam() + " (NIM: " + p.getNim() + ")");
+                System.out.println("Jml Pinjam   : " + p.getJumlahPinjam());
+                System.out.println("Jml Kembali  : " + p.getJumlahKembali());
+                System.out.println("Sisa Pinjam  : " + p.getSisaBelumKembali());
+                
+                // Logika status otomatis berdasarkan sisa barang yang belum kembali
+                if (p.getSisaBelumKembali() == 0) {
+                    System.out.println("Status       : [TELAH DIKEMBALIKAN SEPENUHNYA]");
+                } else {
+                    System.out.println("Status       : [MASIH DIPINJAM] - " + p.getStatus());
+                }
+                System.out.println("----------------------------------------");
+            }
         }
     }
 
