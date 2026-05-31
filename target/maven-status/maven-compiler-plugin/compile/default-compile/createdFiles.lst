@@ -1,0 +1,15 @@
+view\MainGUI$2.class
+view\MainConsole.class
+controller\PeminjamanController.class
+controller\LaporanController.class
+model\BarangNonElektronik.class
+model\Barang.class
+model\BarangElektronik.class
+controller\InventoryController.class
+model\OperasiBarang.class
+model\OperasiPeminjaman.class
+view\Main.class
+view\MainGUI$1.class
+exception\ValidationException.class
+model\Peminjaman.class
+view\MainGUI.class
