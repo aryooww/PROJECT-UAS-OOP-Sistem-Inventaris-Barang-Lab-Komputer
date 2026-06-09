@@ -81,5 +81,17 @@ public class InventoryController implements OperasiBarang {
         }
         return hasil;
     }
+
+    public List<Barang> sortByNama() {
+        List<Barang> sorted = new ArrayList<>(daftarBarang);
+        sorted.sort((b1, b2) -> b1.getNama().compareToIgnoreCase(b2.getNama()));
+        return sorted;
+    }
+
+    public List<Barang> sortByJumlah() {
+        List<Barang> sorted = new ArrayList<>(daftarBarang);
+        sorted.sort((b1, b2) -> Integer.compare(b1.getJumlah(), b2.getJumlah()));
+        return sorted;
+    }
 } 
 

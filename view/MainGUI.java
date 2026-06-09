@@ -7,6 +7,7 @@ import controller.InventoryController;
 import controller.LaporanController;
 import controller.PeminjamanController;
 import exception.ValidationException;
+import exception.InputTidakValidException;
 import model.*;
 
 import java.awt.*;
@@ -50,13 +51,37 @@ public class MainGUI extends JFrame {
         JPanel panel = new JPanel(new BorderLayout(10, 10));
         panel.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
 
+        // Panel atas untuk filter dan sorting
+        JPanel topPanel = new JPanel(new GridLayout(2, 1, 5, 5));
+        
+        // Filter panel
         JPanel filterPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
         filterPanel.add(new JLabel("Filter Kategori:"));
         filterCombo = new JComboBox<>(new String[]{"Semua", "Elektronik", "Non-Elektronik", "Fragile"});
         filterCombo.addActionListener(e -> refreshBarangTable());
         filterPanel.add(filterCombo);
-
-        panel.add(filterPanel, BorderLayout.NORTH);
+        
+        // Sorting panel
+        JPanel sortPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
+        JButton btnSortNama = new JButton("Urutkan Nama (A-Z)");
+        JButton btnSortJumlah = new JButton("Urutkan Jumlah (Terendah)");
+        
+        btnSortNama.addActionListener(e -> {
+            List<Barang> sorted = inventoryController.sortByNama();
+            refreshBarangTable(sorted);
+        });
+        
+        btnSortJumlah.addActionListener(e -> {
+            List<Barang> sorted = inventoryController.sortByJumlah();
+            refreshBarangTable(sorted);
+        });
+        
+        sortPanel.add(btnSortNama);
+        sortPanel.add(btnSortJumlah);
+        
+        topPanel.add(filterPanel);
+        topPanel.add(sortPanel);
+        panel.add(topPanel, BorderLayout.NORTH);
 
         // Tabel barang
         barangTableModel = new DefaultTableModel(new String[]{"ID", "Nama", "Jumlah", "Lokasi", "Kategori"}, 0) {
@@ -100,6 +125,11 @@ public class MainGUI extends JFrame {
         } else {
             data = inventoryController.getFilteredBarang(selectedFilter);
         }
+        refreshBarangTable(data);
+    }
+    
+    // Overload untuk menampilkan data tertentu (misalnya hasil sorting)
+    private void refreshBarangTable(List<Barang> data) {
         barangTableModel.setRowCount(0);
         for (Barang b : data) {
             barangTableModel.addRow(new Object[]{
@@ -110,7 +140,7 @@ public class MainGUI extends JFrame {
 
     private void showTambahBarangDialog() {
         JDialog dialog = new JDialog(this, "Tambah Barang", true);
-        dialog.setSize(400, 400); // perbesar sedikit
+        dialog.setSize(400, 400);
         dialog.setLayout(new GridBagLayout());
         GridBagConstraints gbc = new GridBagConstraints();
         gbc.insets = new Insets(5, 5, 5, 5);
@@ -126,7 +156,6 @@ public class MainGUI extends JFrame {
         JLabel labelTegangan = new JLabel("Tegangan (Volt):");
         JLabel labelBahan = new JLabel("Bahan:");
 
-        // Atur visibilitas awal: Elektronik -> tampilkan tegangan, sembunyikan bahan
         tfTegangan.setVisible(true);
         labelTegangan.setVisible(true);
         tfBahan.setVisible(false);
@@ -147,7 +176,7 @@ public class MainGUI extends JFrame {
                 if (idx == 1) labelBahan.setText("Bahan (Non-Elektronik):");
                 else labelBahan.setText("Bahan (Fragile):");
             }
-            dialog.pack(); // optional: agar ukuran dialog menyesuaikan
+            dialog.pack();
         });
 
         // Layout komponen
@@ -180,34 +209,58 @@ public class MainGUI extends JFrame {
                 int jenis = cbJenis.getSelectedIndex(); // 0,1,2
                 String id = tfId.getText().trim();
                 String nama = tfNama.getText().trim();
-                int jumlah = Integer.parseInt(tfJumlah.getText().trim());
+                String jumlahStr = tfJumlah.getText().trim();
                 String lokasi = tfLokasi.getText().trim();
 
-                if (id.isEmpty() || nama.isEmpty() || lokasi.isEmpty())
-                    throw new ValidationException("Semua field harus diisi");
+                // === VALIDASI DENGAN CUSTOM EXCEPTION ===
+                if (id.isEmpty() || nama.isEmpty() || jumlahStr.isEmpty() || lokasi.isEmpty())
+                    throw new InputTidakValidException("Semua field harus diisi!");
+                
+                int jumlah;
+                try {
+                    jumlah = Integer.parseInt(jumlahStr);
+                } catch (NumberFormatException ex) {
+                    throw new InputTidakValidException("Jumlah harus berupa angka!");
+                }
+                if (jumlah <= 0)
+                    throw new InputTidakValidException("Jumlah harus lebih dari 0!");
 
                 if (jenis == 0) { // Elektronik
-                    int tegangan = Integer.parseInt(tfTegangan.getText().trim());
+                    String teganganStr = tfTegangan.getText().trim();
+                    if (teganganStr.isEmpty())
+                        throw new InputTidakValidException("Tegangan harus diisi!");
+                    int tegangan;
+                    try {
+                        tegangan = Integer.parseInt(teganganStr);
+                    } catch (NumberFormatException ex) {
+                        throw new InputTidakValidException("Tegangan harus berupa angka!");
+                    }
+                    if (tegangan <= 0)
+                        throw new InputTidakValidException("Tegangan harus positif!");
                     BarangElektronik b = new BarangElektronik(id, nama, jumlah, lokasi, tegangan);
                     inventoryController.tambahBarang(b);
                 } else if (jenis == 1) { // Non-Elektronik
                     String bahan = tfBahan.getText().trim();
-                    if (bahan.isEmpty()) throw new ValidationException("Bahan harus diisi");
+                    if (bahan.isEmpty())
+                        throw new InputTidakValidException("Bahan harus diisi!");
                     BarangNonElektronik b = new BarangNonElektronik(id, nama, jumlah, lokasi, bahan);
                     inventoryController.tambahBarang(b);
                 } else { // Fragile
                     String bahan = tfBahan.getText().trim();
-                    if (bahan.isEmpty()) throw new ValidationException("Bahan harus diisi");
+                    if (bahan.isEmpty())
+                        throw new InputTidakValidException("Bahan harus diisi!");
                     BarangFragile b = new BarangFragile(id, nama, jumlah, lokasi, bahan);
                     inventoryController.tambahBarang(b);
                 }
                 refreshBarangTable();
                 dialog.dispose();
                 JOptionPane.showMessageDialog(this, "Barang berhasil ditambahkan", "Sukses", JOptionPane.INFORMATION_MESSAGE);
+            } catch (InputTidakValidException ex) {
+                JOptionPane.showMessageDialog(dialog, ex.getMessage(), "Validasi Gagal", JOptionPane.ERROR_MESSAGE);
             } catch (ValidationException ex) {
                 JOptionPane.showMessageDialog(dialog, ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
             } catch (NumberFormatException ex) {
-                JOptionPane.showMessageDialog(dialog, "Jumlah dan tegangan harus angka", "Error", JOptionPane.ERROR_MESSAGE);
+                JOptionPane.showMessageDialog(dialog, "Format angka tidak valid", "Error", JOptionPane.ERROR_MESSAGE);
             }
         });
         gbc.gridx = 0; gbc.gridy = row; gbc.gridwidth = 2;
@@ -253,14 +306,31 @@ public class MainGUI extends JFrame {
         btnUpdate.addActionListener(e -> {
             try {
                 String namaBaru = tfNama.getText().trim();
-                int jumlahBaru = Integer.parseInt(tfJumlah.getText().trim());
+                String jumlahStr = tfJumlah.getText().trim();
                 String lokasiBaru = tfLokasi.getText().trim();
+                
+                // Validasi dengan custom exception
+                if (namaBaru.isEmpty() || jumlahStr.isEmpty() || lokasiBaru.isEmpty())
+                    throw new InputTidakValidException("Semua field harus diisi!");
+                int jumlahBaru;
+                try {
+                    jumlahBaru = Integer.parseInt(jumlahStr);
+                } catch (NumberFormatException ex) {
+                    throw new InputTidakValidException("Jumlah harus berupa angka!");
+                }
+                if (jumlahBaru < 0)
+                    throw new InputTidakValidException("Jumlah tidak boleh negatif!");
+                
                 inventoryController.updateBarang(id, namaBaru, jumlahBaru, lokasiBaru);
                 refreshBarangTable();
                 dialog.dispose();
                 JOptionPane.showMessageDialog(this, "Update berhasil", "Sukses", JOptionPane.INFORMATION_MESSAGE);
-            } catch (ValidationException | NumberFormatException ex) {
+            } catch (InputTidakValidException ex) {
+                JOptionPane.showMessageDialog(dialog, ex.getMessage(), "Validasi Gagal", JOptionPane.ERROR_MESSAGE);
+            } catch (ValidationException ex) {
                 JOptionPane.showMessageDialog(dialog, ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+            } catch (NumberFormatException ex) {
+                JOptionPane.showMessageDialog(dialog, "Format angka tidak valid", "Error", JOptionPane.ERROR_MESSAGE);
             }
         });
         gbc.gridx = 0; gbc.gridy = 3;
@@ -374,16 +444,32 @@ public class MainGUI extends JFrame {
                 String idBarang = tfIdBarang.getText().trim();
                 String nama = tfNama.getText().trim();
                 String nim = tfNim.getText().trim();
-                int jumlah = Integer.parseInt(tfJumlah.getText().trim());
-                if (idBarang.isEmpty() || nama.isEmpty() || nim.isEmpty())
-                    throw new ValidationException("Semua field harus diisi");
+                String jumlahStr = tfJumlah.getText().trim();
+
+                // Validasi dengan custom exception
+                if (idBarang.isEmpty() || nama.isEmpty() || nim.isEmpty() || jumlahStr.isEmpty())
+                    throw new InputTidakValidException("Semua field harus diisi!");
+                
+                int jumlah;
+                try {
+                    jumlah = Integer.parseInt(jumlahStr);
+                } catch (NumberFormatException ex) {
+                    throw new InputTidakValidException("Jumlah pinjam harus berupa angka!");
+                }
+                if (jumlah <= 0)
+                    throw new InputTidakValidException("Jumlah pinjam harus lebih dari 0!");
+                
                 peminjamanController.pinjamBarang(idBarang, nama, nim, jumlah);
                 refreshPeminjamanTable();
                 refreshBarangTable(); // update stok
                 dialog.dispose();
                 JOptionPane.showMessageDialog(this, "Peminjaman berhasil", "Sukses", JOptionPane.INFORMATION_MESSAGE);
-            } catch (ValidationException | NumberFormatException ex) {
+            } catch (InputTidakValidException ex) {
+                JOptionPane.showMessageDialog(dialog, ex.getMessage(), "Validasi Gagal", JOptionPane.ERROR_MESSAGE);
+            } catch (ValidationException ex) {
                 JOptionPane.showMessageDialog(dialog, ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+            } catch (NumberFormatException ex) {
+                JOptionPane.showMessageDialog(dialog, "Format angka tidak valid", "Error", JOptionPane.ERROR_MESSAGE);
             }
         });
         gbc.gridx = 0; gbc.gridy = 4; gbc.gridwidth = 2;
@@ -403,12 +489,18 @@ public class MainGUI extends JFrame {
         if (input == null) return;
         try {
             int jml = Integer.parseInt(input);
+            // Validasi dengan custom exception
+            if (jml <= 0) throw new InputTidakValidException("Jumlah kembali harus lebih dari 0!");
             peminjamanController.kembalikanBarang(idPinjam, jml);
             refreshPeminjamanTable();
             refreshBarangTable(); // update stok
             JOptionPane.showMessageDialog(this, "Pengembalian berhasil", "Sukses", JOptionPane.INFORMATION_MESSAGE);
-        } catch (ValidationException | NumberFormatException ex) {
+        } catch (InputTidakValidException ex) {
+            JOptionPane.showMessageDialog(this, ex.getMessage(), "Validasi Gagal", JOptionPane.ERROR_MESSAGE);
+        } catch (ValidationException ex) {
             JOptionPane.showMessageDialog(this, ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+        } catch (NumberFormatException ex) {
+            JOptionPane.showMessageDialog(this, "Jumlah harus berupa angka!", "Error", JOptionPane.ERROR_MESSAGE);
         }
     }
 
@@ -426,10 +518,7 @@ public class MainGUI extends JFrame {
         JButton btnPeminjaman = new JButton("Laporan Semua Peminjaman");
 
         btnInventaris.addActionListener(e -> {
-            // Tampilkan laporan inventaris
             StringBuilder sb = new StringBuilder();
-            laporanController.laporanInventaris(inventoryController.getAllBarang(), peminjamanController.getAllPeminjaman());
-            // Karena laporanController mencetak ke console, kita redirect ke textArea. Untuk praktis, kita buat ulang.
             sb.append("=== LAPORAN INVENTARIS BARANG ===\n");
             sb.append(String.format("%-10s %-20s %-10s %-10s %-15s\n", "ID", "Nama", "Jumlah", "Lokasi", "Kategori"));
             for (Barang b : inventoryController.getAllBarang()) {
@@ -461,7 +550,7 @@ public class MainGUI extends JFrame {
     private void seedData() {
         try {
             inventoryController.tambahBarang(new BarangElektronik("EL001", "Multimeter", 5, "Rak A1", 220));
-            inventoryController.tambahBarang(new BarangNonElektronik("LAB002", "Tabung Reaksi", 20, "Lemari B2", "Kaca"));
+            inventoryController.tambahBarang(new BarangNonElektronik("LAB002", "Kain Kasa", 20, "Lemari B2", "Kain"));
             inventoryController.tambahBarang(new BarangFragile("FR003", "Lampu Halogen", 10, "Rak C3", "Kaca"));
         } catch (ValidationException e) {
             // ignore
