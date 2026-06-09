@@ -1,26 +1,18 @@
-# Sistem Manajemen Inventaris dan Peminjaman
+## 🚀 Update Versi 2.0 - Fitur Barang Rentan (Fragile)
 
-Aplikasi desktop berbasis Java Swing untuk mengelola data barang, peminjaman barang, serta pembuatan laporan.
+Fitur baru yang ditambahkan pada versi ini adalah dukungan untuk **Barang Rentan (Fragile)**.
 
-## Fitur Utama
+### Penambahan:
+1. **Subclass BarangRentan** - Mewarisi dari class `Barang` dengan atribut tambahan `tingkatKerapuhan` (1-10)
+2. **Polimorfisme** - Override method `getKategori()` dan `toString()` untuk menampilkan informasi kerapuhan
+3. **Sorting** - Barang rentan dapat diurutkan berdasarkan tingkat kerapuhan tertinggi (prioritas penanganan)
+4. **Custom Exception** - `KerapuhanTidakValidException` untuk memvalidasi input tingkat kerapuhan (range 1-10)
+5. **Menu Baru** - Opsi nomor 6 pada menu utama untuk melihat daftar barang rentan terurut
 
-- **Manajemen Barang**  
-  - Tambah, edit, hapus barang  
-  - Dua jenis barang: Elektronik (tegangan) dan Non-Elektronik (bahan)  
+### Cara Menggunakan:
+- Pilih menu 2 → pilih kategori 3 (Barang Rentan) → masukkan tingkat kerapuhan 1-10
+- Pilih menu 6 untuk melihat daftar barang rentan yang sudah diurutkan dari yang paling rapuh
 
-- **Peminjaman & Pengembalian**  
-  - Peminjaman barang dengan pencatatan kondisi awal  
-  - Pengembalian sebagian/seluruh jumlah  
-  - Status peminjaman ("DIPINJAM", "SEBAGIAN", "SELESAI")  
+---
 
-- **Laporan**  
-  - Cetak laporan data barang  
-  - Cetak laporan riwayat peminjaman dan pengembalian
-
-## Teknologi yang Digunakan
-
-- Java 8 atau lebih tinggi
-- Java Swing (GUI)
-- Model-View-Controller (MVC) pattern
-- Penyimpanan data sementara dalam memori (ArrayList)
-
+*Fitur ini dikembangkan sebagai bagian dari Ujian Akhir Semester Genap 2025/2026*
