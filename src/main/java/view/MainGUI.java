@@ -6,6 +6,7 @@ import javax.swing.table.DefaultTableModel;
 import controller.InventoryController;
 import controller.LaporanController;
 import controller.PeminjamanController;
+import exception.KerapuhanTidakValidException;
 import exception.ValidationException;
 import model.*;
 
@@ -29,9 +30,9 @@ public class MainGUI extends JFrame {
         laporanController = new LaporanController();
         seedData();
 
-        setTitle("Sistem Inventaris Barang Laboratorium");
+        setTitle("Sistem Inventaris Barang Laboratorium - Versi 2.0");
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        setSize(900, 600);
+        setSize(1000, 650);
         setLocationRelativeTo(null);
 
         // Membuat tab utama
@@ -39,6 +40,9 @@ public class MainGUI extends JFrame {
         tabbedPane.addTab("Kelola Barang", createBarangPanel());
         tabbedPane.addTab("Kelola Peminjaman", createPeminjamanPanel());
         tabbedPane.addTab("Laporan", createLaporanPanel());
+        
+        // === C(a). TAB KHUSUS untuk fitur Barang Rentan (Sorting) ===
+        tabbedPane.addTab("Barang Rentan (Prioritas)", createBarangRentanPanel());
 
         add(tabbedPane);
         setVisible(true);
@@ -92,55 +96,131 @@ public class MainGUI extends JFrame {
         }
     }
 
+    // === A(a), A(b), A(c). DIALOG TAMBAH BARANG (termasuk opsi BarangRentan) ===
     private void showTambahBarangDialog() {
         JDialog dialog = new JDialog(this, "Tambah Barang", true);
-        dialog.setSize(400, 350);
+        dialog.setSize(450, 450);
         dialog.setLayout(new GridBagLayout());
         GridBagConstraints gbc = new GridBagConstraints();
         gbc.insets = new Insets(5, 5, 5, 5);
         gbc.fill = GridBagConstraints.HORIZONTAL;
 
-        JComboBox<String> cbJenis = new JComboBox<>(new String[]{"Elektronik", "Non-Elektronik"});
+        // === C(a). OPSI KATEGORI termasuk Barang Rentan ===
+        JComboBox<String> cbJenis = new JComboBox<>(new String[]{"Elektronik", "Non-Elektronik", "Barang Rentan (Fragile)"});
         JTextField tfId = new JTextField(15);
         JTextField tfNama = new JTextField(15);
         JTextField tfJumlah = new JTextField(15);
         JTextField tfLokasi = new JTextField(15);
         JTextField tfTegangan = new JTextField(15);
         JTextField tfBahan = new JTextField(15);
+        JTextField tfKerapuhan = new JTextField(15); // === A(b). Field untuk atribut unik
 
+        // Panel untuk field dinamis
+        JPanel dynamicPanel = new JPanel(new GridBagLayout());
+        GridBagConstraints dynamicGbc = new GridBagConstraints();
+        dynamicGbc.insets = new Insets(5, 5, 5, 5);
+        dynamicGbc.fill = GridBagConstraints.HORIZONTAL;
+        dynamicGbc.gridx = 0;
+        dynamicGbc.gridy = 0;
+        
+        JLabel lblTegangan = new JLabel("Tegangan (Volt) - Elektronik:");
+        JLabel lblBahan = new JLabel("Bahan - Non-Elektronik:");
+        JLabel lblKerapuhan = new JLabel("Tingkat Kerapuhan (1-10, 10=sangat rapuh):");
+        
+        // Default tampilkan tegangan
+        dynamicPanel.add(lblTegangan, dynamicGbc);
+        dynamicGbc.gridx = 1;
+        dynamicPanel.add(tfTegangan, dynamicGbc);
+        
+        // Sembunyikan field lainnya terlebih dahulu
+        lblBahan.setVisible(false);
+        tfBahan.setVisible(false);
+        lblKerapuhan.setVisible(false);
+        tfKerapuhan.setVisible(false);
+
+        // Listener untuk combo box
+        cbJenis.addActionListener(e -> {
+            dynamicPanel.removeAll();
+            dynamicGbc.gridx = 0;
+            dynamicGbc.gridy = 0;
+            
+            if (cbJenis.getSelectedIndex() == 0) { // Elektronik
+                lblTegangan.setVisible(true);
+                tfTegangan.setVisible(true);
+                lblBahan.setVisible(false);
+                tfBahan.setVisible(false);
+                lblKerapuhan.setVisible(false);
+                tfKerapuhan.setVisible(false);
+                
+                dynamicPanel.add(lblTegangan, dynamicGbc);
+                dynamicGbc.gridx = 1;
+                dynamicPanel.add(tfTegangan, dynamicGbc);
+            } else if (cbJenis.getSelectedIndex() == 1) { // Non-Elektronik
+                lblTegangan.setVisible(false);
+                tfTegangan.setVisible(false);
+                lblBahan.setVisible(true);
+                tfBahan.setVisible(true);
+                lblKerapuhan.setVisible(false);
+                tfKerapuhan.setVisible(false);
+                
+                dynamicPanel.add(lblBahan, dynamicGbc);
+                dynamicGbc.gridx = 1;
+                dynamicPanel.add(tfBahan, dynamicGbc);
+            } else { // === A(a). Barang Rentan (Fragile) ===
+                lblTegangan.setVisible(false);
+                tfTegangan.setVisible(false);
+                lblBahan.setVisible(false);
+                tfBahan.setVisible(false);
+                lblKerapuhan.setVisible(true);
+                tfKerapuhan.setVisible(true);
+                
+                dynamicPanel.add(lblKerapuhan, dynamicGbc);
+                dynamicGbc.gridx = 1;
+                dynamicPanel.add(tfKerapuhan, dynamicGbc);
+            }
+            
+            dynamicPanel.revalidate();
+            dynamicPanel.repaint();
+            dialog.pack();
+        });
+
+        // Menambahkan komponen ke dialog utama
         gbc.gridx = 0; gbc.gridy = 0;
-        dialog.add(new JLabel("Jenis:"), gbc);
+        dialog.add(new JLabel("Jenis Barang:"), gbc);
         gbc.gridx = 1;
         dialog.add(cbJenis, gbc);
+        
         gbc.gridx = 0; gbc.gridy = 1;
         dialog.add(new JLabel("ID Barang:"), gbc);
         gbc.gridx = 1;
         dialog.add(tfId, gbc);
+        
         gbc.gridx = 0; gbc.gridy = 2;
-        dialog.add(new JLabel("Nama:"), gbc);
+        dialog.add(new JLabel("Nama Barang:"), gbc);
         gbc.gridx = 1;
         dialog.add(tfNama, gbc);
+        
         gbc.gridx = 0; gbc.gridy = 3;
         dialog.add(new JLabel("Jumlah:"), gbc);
         gbc.gridx = 1;
         dialog.add(tfJumlah, gbc);
+        
         gbc.gridx = 0; gbc.gridy = 4;
         dialog.add(new JLabel("Lokasi:"), gbc);
         gbc.gridx = 1;
         dialog.add(tfLokasi, gbc);
+        
+        // Menambahkan panel dinamis
         gbc.gridx = 0; gbc.gridy = 5;
-        dialog.add(new JLabel("Tegangan (Elektronik):"), gbc);
-        gbc.gridx = 1;
-        dialog.add(tfTegangan, gbc);
-        gbc.gridx = 0; gbc.gridy = 6;
-        dialog.add(new JLabel("Bahan (Non-Elektronik):"), gbc);
-        gbc.gridx = 1;
-        dialog.add(tfBahan, gbc);
+        gbc.gridwidth = 2;
+        dialog.add(dynamicPanel, gbc);
 
         JButton btnSave = new JButton("Simpan");
+        
+        // === C(c). TRY-CATCH untuk validasi input ===
         btnSave.addActionListener(e -> {
             try {
-                int jenis = cbJenis.getSelectedIndex() + 1; // 1=Elektronik, 2=Non
+                int jenis = cbJenis.getSelectedIndex();
                 String id = tfId.getText().trim();
                 String nama = tfNama.getText().trim();
                 int jumlah = Integer.parseInt(tfJumlah.getText().trim());
@@ -149,13 +229,30 @@ public class MainGUI extends JFrame {
                 if (id.isEmpty() || nama.isEmpty() || lokasi.isEmpty())
                     throw new ValidationException("Semua field harus diisi");
 
-                if (jenis == 1) {
+                if (jenis == 0) { // Elektronik
+                    if (tfTegangan.getText().trim().isEmpty())
+                        throw new ValidationException("Tegangan harus diisi");
                     int tegangan = Integer.parseInt(tfTegangan.getText().trim());
                     BarangElektronik b = new BarangElektronik(id, nama, jumlah, lokasi, tegangan);
                     inventoryController.tambahBarang(b);
-                } else {
+                } else if (jenis == 1) { // Non-Elektronik
+                    if (tfBahan.getText().trim().isEmpty())
+                        throw new ValidationException("Bahan harus diisi");
                     String bahan = tfBahan.getText().trim();
                     BarangNonElektronik b = new BarangNonElektronik(id, nama, jumlah, lokasi, bahan);
+                    inventoryController.tambahBarang(b);
+                } else { // === A(a). Barang Rentan dengan validasi custom exception ===
+                    if (tfKerapuhan.getText().trim().isEmpty())
+                        throw new ValidationException("Tingkat kerapuhan harus diisi");
+                    int kerapuhan = Integer.parseInt(tfKerapuhan.getText().trim());
+                    
+                    // === C(c). Validasi dengan CUSTOM EXCEPTION ===
+                    if (kerapuhan < 1 || kerapuhan > 10) {
+                        throw new KerapuhanTidakValidException("Tingkat kerapuhan harus antara 1 dan 10!");
+                    }
+                    
+                    // === A(a). Membuat objek subclass BarangRentan ===
+                    BarangRentan b = new BarangRentan(id, nama, jumlah, lokasi, kerapuhan);
                     inventoryController.tambahBarang(b);
                 }
                 refreshBarangTable();
@@ -163,14 +260,18 @@ public class MainGUI extends JFrame {
                 JOptionPane.showMessageDialog(this, "Barang berhasil ditambahkan", "Sukses", JOptionPane.INFORMATION_MESSAGE);
             } catch (ValidationException ex) {
                 JOptionPane.showMessageDialog(dialog, ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+            } catch (KerapuhanTidakValidException ex) {
+                // === C(c). Menangkap custom exception ===
+                JOptionPane.showMessageDialog(dialog, ex.getMessage(), "Validasi Gagal", JOptionPane.ERROR_MESSAGE);
             } catch (NumberFormatException ex) {
-                JOptionPane.showMessageDialog(dialog, "Jumlah, tegangan harus angka", "Error", JOptionPane.ERROR_MESSAGE);
+                JOptionPane.showMessageDialog(dialog, "Jumlah, tegangan, dan kerapuhan harus berupa angka", "Error", JOptionPane.ERROR_MESSAGE);
             }
         });
 
-        gbc.gridx = 0; gbc.gridy = 7;
+        gbc.gridx = 0; gbc.gridy = 6;
         gbc.gridwidth = 2;
         dialog.add(btnSave, gbc);
+        
         dialog.setVisible(true);
     }
 
@@ -338,7 +439,7 @@ public class MainGUI extends JFrame {
                     throw new ValidationException("Semua field harus diisi");
                 peminjamanController.pinjamBarang(idBarang, nama, nim, jumlah);
                 refreshPeminjamanTable();
-                refreshBarangTable(); // update stok
+                refreshBarangTable();
                 dialog.dispose();
                 JOptionPane.showMessageDialog(this, "Peminjaman berhasil", "Sukses", JOptionPane.INFORMATION_MESSAGE);
             } catch (ValidationException | NumberFormatException ex) {
@@ -364,7 +465,7 @@ public class MainGUI extends JFrame {
             int jml = Integer.parseInt(input);
             peminjamanController.kembalikanBarang(idPinjam, jml);
             refreshPeminjamanTable();
-            refreshBarangTable(); // update stok
+            refreshBarangTable();
             JOptionPane.showMessageDialog(this, "Pengembalian berhasil", "Sukses", JOptionPane.INFORMATION_MESSAGE);
         } catch (ValidationException | NumberFormatException ex) {
             JOptionPane.showMessageDialog(this, ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
@@ -385,14 +486,12 @@ public class MainGUI extends JFrame {
         JButton btnPeminjaman = new JButton("Laporan Semua Peminjaman");
 
         btnInventaris.addActionListener(e -> {
-            // Tampilkan laporan inventaris
             StringBuilder sb = new StringBuilder();
-            laporanController.laporanInventaris(inventoryController.getAllBarang(), peminjamanController.getAllPeminjaman());
-            // Karena laporanController mencetak ke console, kita redirect ke textArea. Untuk praktis, kita buat ulang.
             sb.append("=== LAPORAN INVENTARIS BARANG ===\n");
-            sb.append(String.format("%-10s %-20s %-10s %-10s %-15s\n", "ID", "Nama", "Jumlah", "Lokasi", "Kategori"));
+            sb.append(String.format("%-10s %-20s %-10s %-10s %-20s\n", "ID", "Nama", "Jumlah", "Lokasi", "Kategori"));
+            sb.append("--------------------------------------------------------------------\n");
             for (Barang b : inventoryController.getAllBarang()) {
-                sb.append(String.format("%-10s %-20s %-10d %-10s %-15s\n",
+                sb.append(String.format("%-10s %-20s %-10d %-10s %-20s\n",
                         b.getId(), b.getNama(), b.getJumlah(), b.getLokasi(), b.getKategori()));
             }
             textArea.setText(sb.toString());
@@ -417,10 +516,98 @@ public class MainGUI extends JFrame {
         return panel;
     }
 
+    // ================= PANEL BARANG RENTAN (FITUR SORTING VERSI 2.0) =================
+    // === C(a). PANEL KHUSUS untuk menampilkan fitur sorting barang rentan ===
+    private JPanel createBarangRentanPanel() {
+        JPanel panel = new JPanel(new BorderLayout(10, 10));
+        panel.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
+
+        // Label judul
+        JLabel titleLabel = new JLabel("DAFTAR BARANG RENTAN (TERURUT BERDASARKAN TINGKAT KERAPUHAN TERTINGGI)");
+        titleLabel.setFont(new Font("Arial", Font.BOLD, 14));
+        titleLabel.setHorizontalAlignment(SwingConstants.CENTER);
+        panel.add(titleLabel, BorderLayout.NORTH);
+
+        // Tabel untuk menampilkan barang rentan yang sudah di-sort
+        DefaultTableModel fragileTableModel = new DefaultTableModel(new String[]{"ID", "Nama", "Jumlah", "Lokasi", "Kategori", "Tingkat Kerapuhan"}, 0) {
+            @Override
+            public boolean isCellEditable(int row, int column) {
+                return false;
+            }
+        };
+        JTable fragileTable = new JTable(fragileTableModel);
+        JScrollPane scrollPane = new JScrollPane(fragileTable);
+        panel.add(scrollPane, BorderLayout.CENTER);
+
+        // === B(b). Tombol untuk refresh dan menampilkan hasil sorting ===
+        JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.CENTER));
+        JButton btnRefresh = new JButton("Refresh / Urutkan Barang Rentan");
+        
+        btnRefresh.addActionListener(e -> {
+            // === B(b). Memanggil method sorting dari controller ===
+            List<Barang> sortedFragile = inventoryController.getBarangRentanSortedByKerapuhan();
+            fragileTableModel.setRowCount(0);
+            
+            if (sortedFragile.isEmpty()) {
+                JOptionPane.showMessageDialog(panel, "Belum ada barang rentan. Silakan tambahkan melalui tab 'Kelola Barang'", 
+                        "Informasi", JOptionPane.INFORMATION_MESSAGE);
+            } else {
+                for (Barang b : sortedFragile) {
+                    BarangRentan fr = (BarangRentan) b;
+                    fragileTableModel.addRow(new Object[]{
+                            fr.getId(), 
+                            fr.getNama(), 
+                            fr.getJumlah(), 
+                            fr.getLokasi(), 
+                            fr.getKategori(),
+                            fr.getTingkatKerapuhan() + "/10"
+                    });
+                }
+                // Memberi warna pada baris dengan kerapuhan tinggi (prioritas)
+                fragileTable.setDefaultRenderer(Object.class, new javax.swing.table.DefaultTableCellRenderer() {
+                    @Override
+                    public Component getTableCellRendererComponent(JTable table, Object value, 
+                            boolean isSelected, boolean hasFocus, int row, int column) {
+                        Component c = super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
+                        int kerapuhan = 0;
+                        try {
+                            String kerapuhanStr = (String) table.getValueAt(row, 5);
+                            kerapuhan = Integer.parseInt(kerapuhanStr.replace("/10", ""));
+                        } catch (Exception ex) {}
+                        
+                        if (!isSelected) {
+                            if (kerapuhan >= 8) {
+                                c.setBackground(new Color(255, 200, 200)); // Merah muda (sangat rapuh)
+                            } else if (kerapuhan >= 5) {
+                                c.setBackground(new Color(255, 255, 200)); // Kuning muda (cukup rapuh)
+                            } else {
+                                c.setBackground(Color.WHITE);
+                            }
+                        }
+                        return c;
+                    }
+                });
+                fragileTable.repaint();
+                
+                JOptionPane.showMessageDialog(panel, "Menampilkan " + sortedFragile.size() + " barang rentan yang diurutkan dari yang paling rapuh", 
+                        "Info", JOptionPane.INFORMATION_MESSAGE);
+            }
+        });
+        
+        buttonPanel.add(btnRefresh);
+        panel.add(buttonPanel, BorderLayout.SOUTH);
+        
+        return panel;
+    }
+
     private void seedData() {
         try {
             inventoryController.tambahBarang(new BarangElektronik("EL001", "Multimeter", 5, "Rak A1", 220));
             inventoryController.tambahBarang(new BarangNonElektronik("LAB002", "Tabung Reaksi", 20, "Lemari B2", "Kaca"));
+            // === SEED DATA untuk demo BarangRentan ===
+            inventoryController.tambahBarang(new BarangRentan("FRG001", "Gelas Ukur", 10, "Rak Kaca", 8));
+            inventoryController.tambahBarang(new BarangRentan("FRG002", "Termometer", 5, "Lemari A", 6));
+            inventoryController.tambahBarang(new BarangRentan("FRG003", "Beaker Glass", 7, "Rak Kaca", 9));
         } catch (ValidationException e) {
             // ignore
         }
