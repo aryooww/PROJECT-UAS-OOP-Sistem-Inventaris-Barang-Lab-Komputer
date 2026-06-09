@@ -1,7 +1,6 @@
 package view;
 
 import javax.swing.SwingUtilities;
-
 import java.util.Scanner;
 
 public class Main {
@@ -9,7 +8,7 @@ public class Main {
         Scanner scanner = new Scanner(System.in);
         
         System.out.println("==================================================");
-        System.out.println("      SISTEM INVENTARIS BARANG LAB        ");
+        System.out.println("      SISTEM INVENTARIS BARANG LAB     ");
         System.out.println("==================================================");
         System.out.println("Pilih mode tampilan aplikasi:");
         System.out.println("1. Mode Terminal / Console (CLI)");
@@ -20,13 +19,11 @@ public class Main {
         
         if (pilihan.equals("1")) {
             System.out.println("\n[!] Memulai Aplikasi Mode Console...\n");
-            // Menjalankan MainConsole.java
             MainConsole consoleApp = new MainConsole();
             consoleApp.start();
             
         } else if (pilihan.equals("2")) {
             System.out.println("\n[!] Memulai Aplikasi Mode GUI...");
-            // Menjalankan MainGUI.java menggunakan thread SwingUtilities agar aman
             SwingUtilities.invokeLater(() -> {
                 new MainGUI();
             });
@@ -38,8 +35,6 @@ public class Main {
                 new MainGUI();
             });
         }
-        
-        // Menutup scanner (Mencegah Resource Leak)
         scanner.close();
     }
 }
