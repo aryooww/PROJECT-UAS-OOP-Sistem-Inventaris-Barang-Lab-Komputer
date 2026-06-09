@@ -1,4 +1,4 @@
-## 🚀 Update Versi 2.0 - Fitur Barang Rentan (Fragile)
+## 🚀 Update Versi 2.0 - Fitur Barang Rentan 
 
 Fitur baru yang ditambahkan pada versi ini adalah dukungan untuk **Barang Rentan (Fragile)**.
 
@@ -14,5 +14,3 @@ Fitur baru yang ditambahkan pada versi ini adalah dukungan untuk **Barang Rentan
 - Pilih menu 6 untuk melihat daftar barang rentan yang sudah diurutkan dari yang paling rapuh
 
 ---
-
-*Fitur ini dikembangkan sebagai bagian dari Ujian Akhir Semester Genap 2025/2026*
