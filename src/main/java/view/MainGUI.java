@@ -605,9 +605,9 @@ public class MainGUI extends JFrame {
             inventoryController.tambahBarang(new BarangElektronik("EL001", "Multimeter", 5, "Rak A1", 220));
             inventoryController.tambahBarang(new BarangNonElektronik("LAB002", "Tabung Reaksi", 20, "Lemari B2", "Kaca"));
             // === SEED DATA untuk demo BarangRentan ===
-            inventoryController.tambahBarang(new BarangRentan("FRG001", "Gelas Ukur", 10, "Rak Kaca", 8));
+            inventoryController.tambahBarang(new BarangRentan("FRG001", "Gelas Ukur", 10, "Rak Kaca", 9));
             inventoryController.tambahBarang(new BarangRentan("FRG002", "Termometer", 5, "Lemari A", 6));
-            inventoryController.tambahBarang(new BarangRentan("FRG003", "Beaker Glass", 7, "Rak Kaca", 9));
+            inventoryController.tambahBarang(new BarangRentan("FRG003", "Monitor", 7, "Rak Kaca", 10));
         } catch (ValidationException e) {
             // ignore
         }
