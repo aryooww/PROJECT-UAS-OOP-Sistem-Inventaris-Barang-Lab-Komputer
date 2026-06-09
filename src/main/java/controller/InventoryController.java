@@ -76,4 +76,16 @@ public class InventoryController implements OperasiBarang {
         return daftarBarang.remove(barang);
     }
 
+    // Tambahkan method ini di dalam class InventoryController Anda
+    public List<Barang> getFilterBarangPremium() {
+        List<Barang> hasilFilter = new ArrayList<>();
+        for (Barang b : daftarBarang) {
+            // instanceof membedakan mana barang premium dan barang biasa
+            if (b instanceof model.BarangPremium) {
+                hasilFilter.add(b);
+            }
+        }
+        return hasilFilter;
+    }
+
 }
