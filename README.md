@@ -1,4 +1,4 @@
-## 🚀 Update Versi 2.0 - Fitur Barang Rentan 
+## Update Versi 2.0 - Fitur Barang Rentan 
 
 Fitur baru yang ditambahkan pada versi ini adalah dukungan untuk **Barang Rentan (Fragile)**.
 
