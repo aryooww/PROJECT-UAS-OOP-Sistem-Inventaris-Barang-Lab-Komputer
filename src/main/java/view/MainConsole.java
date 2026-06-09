@@ -1,10 +1,12 @@
 package view;
 
+import java.util.List;
 import java.util.Scanner;
 
 import controller.InventoryController;
 import controller.LaporanController;
 import controller.PeminjamanController;
+import exception.KerapuhanTidakValidException;
 import exception.ValidationException;
 import model.*;
 
@@ -18,7 +20,7 @@ public class MainConsole {
         inventoryController = new InventoryController();
         peminjamanController = new PeminjamanController(inventoryController);
         laporanController = new LaporanController();
-        scanner = new Scanner(System.in); // Diperbaiki agar tidak dobel deklarasi
+        scanner = new Scanner(System.in);
         seedData();
     }
 
@@ -33,6 +35,7 @@ public class MainConsole {
             System.out.println("3. Lakukan Peminjaman Barang");
             System.out.println("4. Pengembalian Barang");
             System.out.println("5. Cetak Laporan Lengkap (Inventaris & Transaksi)");
+            System.out.println("6. Lihat Barang Rentan (Terurut Kerapuhan Tertinggi)");
             System.out.println("0. Keluar");
             System.out.print("Pilih menu: ");
 
@@ -51,7 +54,10 @@ public class MainConsole {
                     inputPengembalian();
                     break;
                 case "5":
-                    cetakLaporanLengkap(); // Memanggil method baru
+                    cetakLaporanLengkap();
+                    break;
+                case "6":
+                    tampilkanBarangRentanTerurut();
                     break;
                 case "0":
                     berjalan = false;
@@ -88,7 +94,8 @@ public class MainConsole {
         System.out.println("Kategori Barang:");
         System.out.println("1. Elektronik");
         System.out.println("2. Non-Elektronik");
-        System.out.print("Pilih kategori (1/2): ");
+        System.out.println("3. Barang Rentan (Fragile)");
+        System.out.print("Pilih kategori (1/2/3): ");
         String kategori = scanner.nextLine();
 
         try {
@@ -102,11 +109,24 @@ public class MainConsole {
                 String bahan = scanner.nextLine();
                 inventoryController.tambahBarang(new BarangNonElektronik(id, nama, jumlah, lokasi, bahan));
                 System.out.println("Barang Non-Elektronik berhasil ditambahkan!");
+            } else if (kategori.equals("3")) {
+                System.out.print("Tingkat Kerapuhan (1-10, 10=sangat rapuh): ");
+                int kerapuhan = Integer.parseInt(scanner.nextLine());
+                
+                // Validasi dengan custom exception
+                if (kerapuhan < 1 || kerapuhan > 10) {
+                    throw new KerapuhanTidakValidException("Tingkat kerapuhan harus antara 1 dan 10!");
+                }
+                
+                inventoryController.tambahBarang(new BarangRentan(id, nama, jumlah, lokasi, kerapuhan));
+                System.out.println("Barang Rentan berhasil ditambahkan!");
             } else {
                 System.out.println("Kategori tidak valid. Gagal menambah barang.");
             }
         } catch (ValidationException | NumberFormatException e) {
             System.out.println("Error: " + e.getMessage());
+        } catch (KerapuhanTidakValidException e) {
+            System.out.println("Validasi gagal: " + e.getMessage());
         }
     }
 
@@ -148,11 +168,9 @@ public class MainConsole {
         System.out.println("\n========================================");
         System.out.println("          LAPORAN INVENTARIS            ");
         System.out.println("========================================");
-        // Memanggil fungsi cetak inventaris dari controller bawaan
         try {
             laporanController.laporanInventaris(inventoryController);
         } catch (Exception e) {
-            // Backup jika metode LaporanController tidak sesuai
             tampilkanBarang(); 
         }
 
@@ -171,7 +189,6 @@ public class MainConsole {
                 System.out.println("Jml Kembali  : " + p.getJumlahKembali());
                 System.out.println("Sisa Pinjam  : " + p.getSisaBelumKembali());
                 
-                // Logika status otomatis berdasarkan sisa barang yang belum kembali
                 if (p.getSisaBelumKembali() == 0) {
                     System.out.println("Status       : [TELAH DIKEMBALIKAN SEPENUHNYA]");
                 } else {
@@ -182,10 +199,25 @@ public class MainConsole {
         }
     }
 
+    private void tampilkanBarangRentanTerurut() {
+        System.out.println("\n--- DAFTAR BARANG RENTAN (TERURUT KERAPUHAN TERTINGGI) ---");
+        List<Barang> sorted = inventoryController.getBarangRentanSortedByKerapuhan();
+        if (sorted.isEmpty()) {
+            System.out.println("Belum ada barang rentan.");
+        } else {
+            for (Barang b : sorted) {
+                System.out.println(b);
+            }
+        }
+    }
+
     private void seedData() {
         try {
             inventoryController.tambahBarang(new BarangElektronik("EL001", "Multimeter", 5, "Rak A1", 220));
             inventoryController.tambahBarang(new BarangNonElektronik("LAB002", "Tabung Reaksi", 20, "Lemari B2", "Kaca"));
+            // Contoh data barang rentan untuk demo
+            inventoryController.tambahBarang(new BarangRentan("FRG001", "Gelas Ukur", 10, "Rak Kaca", 8));
+            inventoryController.tambahBarang(new BarangRentan("FRG002", "Termometer", 5, "Lemari A", 6));
         } catch (ValidationException e) {
             // Abaikan error seed data awal
         }
