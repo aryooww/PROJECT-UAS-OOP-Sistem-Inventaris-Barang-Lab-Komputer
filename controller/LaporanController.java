@@ -45,4 +45,13 @@ public class LaporanController {
             }
         }
     }
+
+    public void laporanInventaris(InventoryController invController) {
+        if (invController == null) {
+            System.out.println("Error: InventoryController tidak tersedia.");
+            return;
+        }
+        List<Peminjaman> pinjamList = null;
+        laporanInventaris(invController.getAllBarang(), pinjamList);
+    }
 }

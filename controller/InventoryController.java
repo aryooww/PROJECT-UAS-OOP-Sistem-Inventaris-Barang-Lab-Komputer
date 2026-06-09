@@ -33,12 +33,11 @@ public class InventoryController implements OperasiBarang {
         return null;
     }
 
-    public List<Barang> CariByNama(String nama) {
+    public List<Barang> cariByNama(String keyword) {
         List<Barang> hasil = new ArrayList<>();
-        for (Barang barang : daftarBarang) {
-            if (barang.getNama().equalsIgnoreCase(nama)) {
-                hasil.add(barang);
-            }
+        for (Barang b : daftarBarang) {
+            if (b.getNama().toLowerCase().contains(keyword.toLowerCase()))
+                hasil.add(b);
         }
         return hasil;
     }
