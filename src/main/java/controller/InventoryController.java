@@ -6,17 +6,10 @@ import java.util.List;
 import exception.ValidationException;
 import model.*;
 
-public class InventoryController implements OperasiBarang {
+public class InventoryController {
     private List<Barang> daftarBarang = new ArrayList<>();
 
     // CREATE
-    @Override
-    public void create() {
-        // Method ini dipanggil dari view dengan input yang sudah divalidasi
-        // Overload dibuat untuk menerima objek Barang langsung
-    }
-
-    // Overload untuk menambah barang langsung
     public void tambahBarang(Barang barang) throws ValidationException {
         if (barang == null) throw new ValidationException("Barang tidak boleh null");
         if (cariById(barang.getId()) != null)
@@ -25,11 +18,6 @@ public class InventoryController implements OperasiBarang {
     }
 
     // READ
-    @Override
-    public void read() {
-        // Output ke view sebaiknya di view, tapi untuk sederhana kita return list
-    }
-
     public List<Barang> getAllBarang() {
         return new ArrayList<>(daftarBarang);
     }
@@ -51,11 +39,6 @@ public class InventoryController implements OperasiBarang {
     }
 
     // UPDATE
-    @Override
-    public void update() {
-        // Dilakukan via view + method ini
-    }
-
     public void updateBarang(String id, String namaBaru, int jumlahBaru, String lokasiBaru) throws ValidationException {
         Barang barang = cariById(id);
         if (barang == null) throw new ValidationException("Barang dengan ID " + id + " tidak ditemukan");
@@ -65,15 +48,25 @@ public class InventoryController implements OperasiBarang {
     }
 
     // DELETE
-    @Override
-    public void delete() {
-        // via view
-    }
-
     public boolean hapusBarang(String id) throws ValidationException {
         Barang barang = cariById(id);
         if (barang == null) throw new ValidationException("ID tidak ditemukan: " + id);
         return daftarBarang.remove(barang);
     }
 
+    // ========== METHOD BARU UNTUK FITUR VERSI 2.0 ==========
+    public List<Barang> getBarangRentanSortedByKerapuhan() {
+        List<Barang> barangRentan = new ArrayList<>();
+        for (Barang b : daftarBarang) {
+            if (b instanceof BarangRentan) {
+                barangRentan.add(b);
+            }
+        }
+        barangRentan.sort((b1, b2) -> {
+            int k1 = ((BarangRentan) b1).getTingkatKerapuhan();
+            int k2 = ((BarangRentan) b2).getTingkatKerapuhan();
+            return Integer.compare(k2, k1); // descending (tertinggi dulu)
+        });
+        return barangRentan;
+    }
 }
