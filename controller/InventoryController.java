@@ -67,6 +67,19 @@ public class InventoryController implements OperasiBarang {
         }
         daftarBarang.remove(barang);
     }
-}
-    
+
+    public List<Barang> getFilteredBarang(String kategoriFilter) {
+        List<Barang> hasil = new ArrayList<>();
+        for (Barang b : daftarBarang) {
+            String kat = b.getKategori();
+            if (kategoriFilter.equals("Elektronik") && kat.contains("Elektronik"))
+                hasil.add(b);
+            else if (kategoriFilter.equals("Non-Elektronik") && kat.contains("Non-Elektronik"))
+                hasil.add(b);
+            else if (kategoriFilter.equals("Fragile") && kat.contains("Fragile"))
+                hasil.add(b);
+        }
+        return hasil;
+    }
+} 
 

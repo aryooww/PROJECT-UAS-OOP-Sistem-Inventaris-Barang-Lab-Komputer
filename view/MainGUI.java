@@ -21,6 +21,7 @@ public class MainGUI extends JFrame {
     private JTabbedPane tabbedPane;
     private JTable barangTable, peminjamanTable;
     private DefaultTableModel barangTableModel, peminjamanTableModel;
+    private JComboBox<String> filterCombo;
 
     public MainGUI() {
         // Inisialisasi controller
@@ -48,6 +49,14 @@ public class MainGUI extends JFrame {
     private JPanel createBarangPanel() {
         JPanel panel = new JPanel(new BorderLayout(10, 10));
         panel.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
+
+        JPanel filterPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
+        filterPanel.add(new JLabel("Filter Kategori:"));
+        filterCombo = new JComboBox<>(new String[]{"Semua", "Elektronik", "Non-Elektronik", "Fragile"});
+        filterCombo.addActionListener(e -> refreshBarangTable());
+        filterPanel.add(filterCombo);
+
+        panel.add(filterPanel, BorderLayout.NORTH);
 
         // Tabel barang
         barangTableModel = new DefaultTableModel(new String[]{"ID", "Nama", "Jumlah", "Lokasi", "Kategori"}, 0) {
@@ -84,63 +93,91 @@ public class MainGUI extends JFrame {
     }
 
     private void refreshBarangTable() {
+        String selectedFilter = (String) filterCombo.getSelectedItem();
+        List<Barang> data;
+        if (selectedFilter.equals("Semua")) {
+            data = inventoryController.getAllBarang();
+        } else {
+            data = inventoryController.getFilteredBarang(selectedFilter);
+        }
         barangTableModel.setRowCount(0);
-        for (Barang b : inventoryController.getAllBarang()) {
+        for (Barang b : data) {
             barangTableModel.addRow(new Object[]{
-                    b.getId(), b.getNama(), b.getJumlah(), b.getLokasi(), b.getKategori()
+                b.getId(), b.getNama(), b.getJumlah(), b.getLokasi(), b.getKategori()
             });
         }
     }
 
     private void showTambahBarangDialog() {
         JDialog dialog = new JDialog(this, "Tambah Barang", true);
-        dialog.setSize(400, 350);
+        dialog.setSize(400, 400); // perbesar sedikit
         dialog.setLayout(new GridBagLayout());
         GridBagConstraints gbc = new GridBagConstraints();
         gbc.insets = new Insets(5, 5, 5, 5);
         gbc.fill = GridBagConstraints.HORIZONTAL;
 
-        JComboBox<String> cbJenis = new JComboBox<>(new String[]{"Elektronik", "Non-Elektronik"});
+        JComboBox<String> cbJenis = new JComboBox<>(new String[]{"Elektronik", "Non-Elektronik", "Fragile"});
         JTextField tfId = new JTextField(15);
         JTextField tfNama = new JTextField(15);
         JTextField tfJumlah = new JTextField(15);
         JTextField tfLokasi = new JTextField(15);
         JTextField tfTegangan = new JTextField(15);
         JTextField tfBahan = new JTextField(15);
+        JLabel labelTegangan = new JLabel("Tegangan (Volt):");
+        JLabel labelBahan = new JLabel("Bahan:");
 
-        gbc.gridx = 0; gbc.gridy = 0;
-        dialog.add(new JLabel("Jenis:"), gbc);
-        gbc.gridx = 1;
-        dialog.add(cbJenis, gbc);
-        gbc.gridx = 0; gbc.gridy = 1;
-        dialog.add(new JLabel("ID Barang:"), gbc);
-        gbc.gridx = 1;
-        dialog.add(tfId, gbc);
-        gbc.gridx = 0; gbc.gridy = 2;
-        dialog.add(new JLabel("Nama:"), gbc);
-        gbc.gridx = 1;
-        dialog.add(tfNama, gbc);
-        gbc.gridx = 0; gbc.gridy = 3;
-        dialog.add(new JLabel("Jumlah:"), gbc);
-        gbc.gridx = 1;
-        dialog.add(tfJumlah, gbc);
-        gbc.gridx = 0; gbc.gridy = 4;
-        dialog.add(new JLabel("Lokasi:"), gbc);
-        gbc.gridx = 1;
-        dialog.add(tfLokasi, gbc);
-        gbc.gridx = 0; gbc.gridy = 5;
-        dialog.add(new JLabel("Tegangan (Elektronik):"), gbc);
-        gbc.gridx = 1;
-        dialog.add(tfTegangan, gbc);
-        gbc.gridx = 0; gbc.gridy = 6;
-        dialog.add(new JLabel("Bahan (Non-Elektronik):"), gbc);
-        gbc.gridx = 1;
-        dialog.add(tfBahan, gbc);
+        // Atur visibilitas awal: Elektronik -> tampilkan tegangan, sembunyikan bahan
+        tfTegangan.setVisible(true);
+        labelTegangan.setVisible(true);
+        tfBahan.setVisible(false);
+        labelBahan.setVisible(false);
+
+        cbJenis.addItemListener(e -> {
+            int idx = cbJenis.getSelectedIndex();
+            if (idx == 0) { // Elektronik
+                labelTegangan.setVisible(true);
+                tfTegangan.setVisible(true);
+                labelBahan.setVisible(false);
+                tfBahan.setVisible(false);
+            } else { // Non-Elektronik (1) atau Fragile (2)
+                labelTegangan.setVisible(false);
+                tfTegangan.setVisible(false);
+                labelBahan.setVisible(true);
+                tfBahan.setVisible(true);
+                if (idx == 1) labelBahan.setText("Bahan (Non-Elektronik):");
+                else labelBahan.setText("Bahan (Fragile):");
+            }
+            dialog.pack(); // optional: agar ukuran dialog menyesuaikan
+        });
+
+        // Layout komponen
+        int row = 0;
+        gbc.gridx = 0; gbc.gridy = row; dialog.add(new JLabel("Jenis:"), gbc);
+        gbc.gridx = 1; dialog.add(cbJenis, gbc);
+        row++;
+        gbc.gridx = 0; gbc.gridy = row; dialog.add(new JLabel("ID Barang:"), gbc);
+        gbc.gridx = 1; dialog.add(tfId, gbc);
+        row++;
+        gbc.gridx = 0; gbc.gridy = row; dialog.add(new JLabel("Nama:"), gbc);
+        gbc.gridx = 1; dialog.add(tfNama, gbc);
+        row++;
+        gbc.gridx = 0; gbc.gridy = row; dialog.add(new JLabel("Jumlah:"), gbc);
+        gbc.gridx = 1; dialog.add(tfJumlah, gbc);
+        row++;
+        gbc.gridx = 0; gbc.gridy = row; dialog.add(new JLabel("Lokasi:"), gbc);
+        gbc.gridx = 1; dialog.add(tfLokasi, gbc);
+        row++;
+        gbc.gridx = 0; gbc.gridy = row; dialog.add(labelTegangan, gbc);
+        gbc.gridx = 1; dialog.add(tfTegangan, gbc);
+        row++;
+        gbc.gridx = 0; gbc.gridy = row; dialog.add(labelBahan, gbc);
+        gbc.gridx = 1; dialog.add(tfBahan, gbc);
+        row++;
 
         JButton btnSave = new JButton("Simpan");
         btnSave.addActionListener(e -> {
             try {
-                int jenis = cbJenis.getSelectedIndex() + 1; // 1=Elektronik, 2=Non
+                int jenis = cbJenis.getSelectedIndex(); // 0,1,2
                 String id = tfId.getText().trim();
                 String nama = tfNama.getText().trim();
                 int jumlah = Integer.parseInt(tfJumlah.getText().trim());
@@ -149,13 +186,19 @@ public class MainGUI extends JFrame {
                 if (id.isEmpty() || nama.isEmpty() || lokasi.isEmpty())
                     throw new ValidationException("Semua field harus diisi");
 
-                if (jenis == 1) {
+                if (jenis == 0) { // Elektronik
                     int tegangan = Integer.parseInt(tfTegangan.getText().trim());
                     BarangElektronik b = new BarangElektronik(id, nama, jumlah, lokasi, tegangan);
                     inventoryController.tambahBarang(b);
-                } else {
+                } else if (jenis == 1) { // Non-Elektronik
                     String bahan = tfBahan.getText().trim();
+                    if (bahan.isEmpty()) throw new ValidationException("Bahan harus diisi");
                     BarangNonElektronik b = new BarangNonElektronik(id, nama, jumlah, lokasi, bahan);
+                    inventoryController.tambahBarang(b);
+                } else { // Fragile
+                    String bahan = tfBahan.getText().trim();
+                    if (bahan.isEmpty()) throw new ValidationException("Bahan harus diisi");
+                    BarangFragile b = new BarangFragile(id, nama, jumlah, lokasi, bahan);
                     inventoryController.tambahBarang(b);
                 }
                 refreshBarangTable();
@@ -164,12 +207,10 @@ public class MainGUI extends JFrame {
             } catch (ValidationException ex) {
                 JOptionPane.showMessageDialog(dialog, ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
             } catch (NumberFormatException ex) {
-                JOptionPane.showMessageDialog(dialog, "Jumlah, tegangan harus angka", "Error", JOptionPane.ERROR_MESSAGE);
+                JOptionPane.showMessageDialog(dialog, "Jumlah dan tegangan harus angka", "Error", JOptionPane.ERROR_MESSAGE);
             }
         });
-
-        gbc.gridx = 0; gbc.gridy = 7;
-        gbc.gridwidth = 2;
+        gbc.gridx = 0; gbc.gridy = row; gbc.gridwidth = 2;
         dialog.add(btnSave, gbc);
         dialog.setVisible(true);
     }
@@ -421,6 +462,7 @@ public class MainGUI extends JFrame {
         try {
             inventoryController.tambahBarang(new BarangElektronik("EL001", "Multimeter", 5, "Rak A1", 220));
             inventoryController.tambahBarang(new BarangNonElektronik("LAB002", "Tabung Reaksi", 20, "Lemari B2", "Kaca"));
+            inventoryController.tambahBarang(new BarangFragile("FR003", "Lampu Halogen", 10, "Rak C3", "Kaca"));
         } catch (ValidationException e) {
             // ignore
         }
